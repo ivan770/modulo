@@ -1,4 +1,4 @@
-name: update
+name: Update
 on:
   workflow_dispatch:
   schedule:
@@ -6,6 +6,7 @@ on:
 
 jobs:
   lockfile:
+    name: "Update flake.lock"
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -20,6 +21,7 @@ jobs:
           pr-body: |
             Automated flake.lock update.
       - name: Automatically merge new PR
+        if: ${{ steps.update.outputs.pull-request-number }}
         run: gh pr merge --merge --auto "${{ steps.update.outputs.pull-request-number }}"
         env:
           GH_TOKEN: ${{ github.token }}
