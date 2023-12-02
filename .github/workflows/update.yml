@@ -1,0 +1,25 @@
+name: update
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * 0'
+
+jobs:
+  lockfile:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Install Nix
+        uses: DeterminateSystems/nix-installer-action@v8
+      - name: Update flake.lock
+        id: update
+        uses: DeterminateSystems/update-flake-lock@v20
+        with:
+          pr-title: "Update flake.lock"
+          pr-body: |
+            Automated flake.lock update.
+      - name: Automatically merge new PR
+        run: gh pr merge --merge --auto "${{ steps.update.outputs.pull-request-number }}"
+        env:
+          GH_TOKEN: ${{ github.token }}
