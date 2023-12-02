@@ -6,10 +6,10 @@
 A collection of NixOS and Home Manager modules that I use
 on my own devices.
 
-[x] Declarative filesystem support with [Disko](https://github.com/nix-community/disko/)
-[x] Impermanence with root filesystem mounted as a `tmpfs`
-[x] Configurable networking using only systemd-based components (networkd, resolved, etc.)
-[x] Pre-configured desktop and server configurations
+- [x] Declarative filesystem support with [Disko](https://github.com/nix-community/disko/)
+- [x] Impermanence with root filesystem mounted as a `tmpfs`
+- [x] Configurable networking using only systemd-based components (networkd, resolved, etc.)
+- [x] Pre-configured desktop and server configurations
 
 ## Usage
 
