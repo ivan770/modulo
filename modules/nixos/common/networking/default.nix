@@ -40,7 +40,7 @@ in {
             '';
           };
 
-          address = {
+          address = mkOption {
             type = with types; listOf str;
             default = [];
             description = ''
@@ -156,7 +156,7 @@ in {
     systemd.network.networks = mapAttrs' (name: options: let
       baseConfig = {
         inherit name;
-        # inherit (options) address;
+        inherit (options) address;
 
         enable = true;
 
