@@ -36,19 +36,10 @@ in {
       mimeApps.enable = true;
     };
 
-    home = {
-      packages = [
-        # Fonts
-        pkgs.corefonts
-        pkgs.liberation_ttf
-        pkgs.jetbrains-mono
-        pkgs.material-design-icons
-        pkgs.noto-fonts
-
-        # Desktop utilities
-        pkgs.wl-clipboard
-        pkgs.xdg-utils
-      ];
-    };
+    home.packages = [
+      # Desktop utilities
+      pkgs.wl-clipboard
+      pkgs.xdg-utils
+    ];
   };
 }
