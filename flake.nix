@@ -31,8 +31,6 @@
 
       src = ./.;
 
-      channels-config.allowUnfree = true;
-
       outputs-builder = channels: let
         inherit (channels.nixpkgs) alejandra deadnix lib runCommand statix;
         inherit (lib) getExe;

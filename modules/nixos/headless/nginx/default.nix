@@ -6,6 +6,7 @@
   inherit
     (lib)
     attrNames
+    concatMapStringsSep
     concatStringsSep
     filterAttrs
     hasAttr
@@ -58,6 +59,43 @@ in {
               will be automatically determined based on the second-level domain.
             '';
           };
+
+          cors = {
+            methods = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              description = ''
+                Allowed HTTP request methods.
+                Access-Control-Allow-Methods header is omitted when empty.
+              '';
+            };
+
+            origin = mkOption {
+              type = types.nullOr types.str;
+              default = null;
+              description = ''
+                Allowed HTTP request origin.
+                Access-Control-Allow-Origin header is omitted when null.
+              '';
+            };
+
+            headers = mkOption {
+              type = types.listOf types.str;
+              default = [];
+              description = ''
+                Allowed HTTP headers.
+                Access-Control-Allow-Headers header is omitted when empty.
+              '';
+            };
+
+            allowCredentials = mkOption {
+              type = types.bool;
+              default = false;
+              description = ''
+                Controls credential exposure to scripts.
+              '';
+            };
+          };
         };
       });
       default = {};
@@ -103,7 +141,9 @@ in {
   };
 
   config = mkIf (cfg.activatedUpstreams != {}) {
-    assertions = [
+    assertions = let
+      mkActivatedUpstreamAssertion = f: (filterAttrs f cfg.activatedUpstreams) == {};
+    in [
       {
         assertion = let
           upstreamed =
@@ -124,23 +164,26 @@ in {
         '';
       }
       {
-        assertion = let
-          incorrectlyActivatedUpstreams =
-            filterAttrs
-            (_: {
-              upstream,
-              redirect,
-              ...
-            }:
-              (upstream == null && redirect == null)
-              || (upstream != null && redirect != null))
-            cfg.activatedUpstreams;
-        in
-          incorrectlyActivatedUpstreams == {};
+        assertion = mkActivatedUpstreamAssertion (_: {
+          upstream,
+          redirect,
+          ...
+        }:
+          (upstream == null && redirect == null)
+          || (upstream != null && redirect != null));
 
         message = ''
           All activated upstreams must have either an upstream reference or
           redirect URL set.
+        '';
+      }
+      {
+        assertion =
+          mkActivatedUpstreamAssertion (_: {cors, ...}:
+            cors.origin == "*" && cors.allowCredentials);
+
+        message = ''
+          Wildcard origin and allowCredentials cannot be used together per https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
         '';
       }
     ];
@@ -193,6 +236,7 @@ in {
             upstream,
             redirect,
             ssl,
+            cors,
           }: {
             useACMEHost = let
               components = splitString "." name;
@@ -212,6 +256,35 @@ in {
             locations."/" = mkIf (upstream != null) {
               proxyPass = "http://${upstream}";
               proxyWebsockets = true;
+
+              extraConfig = let
+                allowedMethods =
+                  cors.methods
+                  ++ ["OPTIONS"];
+
+                sharedConfig = ''
+                  add_header 'Access-Control-Allow-Methods' '${concatStringsSep "," allowedMethods}' always;
+                  ${optionalString (cors.headers != []) "add_header 'Access-Control-Allow-Headers' '${concatStringsSep "," cors.headers}' always;"}
+                  ${optionalString (cors.origin != null) "add_header 'Access-Control-Allow-Origin' '${cors.origin}' always;"}
+                  ${optionalString cors.allowCredentials "add_header 'Access-Control-Allow-Credentials' 'true' always;"}
+                '';
+
+                optionsConfig = ''
+                  add_header 'Access-Control-Max-Age' 2592000;
+                  add_header 'Content-Length' 0;
+                  add_header 'Content-Type' 'text/plain; charset=utf-8';
+                  return 204;
+                '';
+
+                # Requests with OPTIONS method are be handled even if the CORS configuration is empty
+                mkMethodConfig = method: ''
+                  if ($request_method = '${method}') {
+                    ${sharedConfig}
+                    ${optionalString (method == "OPTIONS") optionsConfig}
+                  }
+                '';
+              in
+                concatMapStringsSep "\n" mkMethodConfig allowedMethods;
             };
           })
           cfg.activatedUpstreams)
