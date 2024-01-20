@@ -249,18 +249,9 @@ in {
             forceSSL = true;
             kTLS = true;
 
-            extraConfig = ''
-              ${optionalString (redirect != null) "return 302 ${redirect}$request_uri;"}
-            '';
-
-            locations."/" = mkIf (upstream != null) {
-              proxyPass = "http://${upstream}";
-              proxyWebsockets = true;
-
+            locations = let
               extraConfig = let
-                allowedMethods =
-                  cors.methods
-                  ++ ["OPTIONS"];
+                allowedMethods = cors.methods ++ ["OPTIONS"];
 
                 sharedConfig = ''
                   add_header 'Access-Control-Allow-Methods' '${concatStringsSep "," allowedMethods}' always;
@@ -283,8 +274,35 @@ in {
                     ${optionalString (method == "OPTIONS") optionsConfig}
                   }
                 '';
-              in
-                concatMapStringsSep "\n" mkMethodConfig allowedMethods;
+
+                proxyHide = optionalString (upstream != null) ''
+                  proxy_hide_header Access-Control-Allow-Methods;
+                  proxy_hide_header Access-Control-Allow-Headers;
+                  proxy_hide_header Access-Control-Allow-Origin;
+                  proxy_hide_header Access-Control-Allow-Credentials;
+                '';
+              in ''
+                ${proxyHide}
+                ${concatMapStringsSep "\n" mkMethodConfig allowedMethods}
+              '';
+
+              proxyLocation = {
+                inherit extraConfig;
+
+                proxyPass = "http://${upstream}";
+                proxyWebsockets = true;
+              };
+
+              redirectLocation = {
+                inherit extraConfig;
+
+                return = "302 ${redirect}$request_uri";
+              };
+            in {
+              "/" =
+                if (upstream != null)
+                then proxyLocation
+                else redirectLocation;
             };
           })
           cfg.activatedUpstreams)
