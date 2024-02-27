@@ -235,14 +235,14 @@ in {
 
           type = "disk";
           content = {
-            type = "table";
-            format = "gpt";
-            partitions =
-              (optional options.boot.enable {
-                name = "ESP";
+            type = "gpt";
+            partitions = {
+              ESP = mkIf options.boot.enable {
+                label = "ESP";
+                priority = 1;
+                type = "EF00";
                 start = "1MiB";
                 end = options.boot.size;
-                bootable = true;
                 content = {
                   inherit (options.boot) mountpoint;
 
@@ -252,8 +252,8 @@ in {
                     "defaults"
                   ];
                 };
-              })
-              ++ (let
+              };
+              DATA = let
                 wrapLUKS = content:
                   if options.encrypted
                   then {
@@ -264,20 +264,19 @@ in {
                     extraOpenArgs = ["--allow-discards"];
                   }
                   else content;
-              in [
-                {
-                  name = "DATA";
-                  start =
-                    if options.boot.enable
-                    then options.boot.size
-                    else "1MiB";
-                  end = "100%";
-                  content = wrapLUKS {
-                    type = "lvm_pv";
-                    vg = mkVolumeGroupName device;
-                  };
-                }
-              ]);
+              in {
+                label = "DATA";
+                start =
+                  if options.boot.enable
+                  then options.boot.size
+                  else "1MiB";
+                end = "100%";
+                content = wrapLUKS {
+                  type = "lvm_pv";
+                  vg = mkVolumeGroupName device;
+                };
+              };
+            };
           };
         })
         cfg.disks;
