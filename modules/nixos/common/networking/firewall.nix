@@ -78,9 +78,12 @@ in {
               extendedConfig = isAttrs portConfig;
 
               port =
-                if extendedConfig
-                then portConfig.name
-                else portConfig;
+                builtins.toString
+                (
+                  if extendedConfig
+                  then portConfig.name
+                  else portConfig
+                );
 
               rateLimiter = optionalString (extendedConfig && portConfig.rateLimit != null) ''
                 ct state new \
