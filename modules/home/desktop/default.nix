@@ -4,12 +4,20 @@
   pkgs,
   ...
 }: let
-  inherit (lib) mkEnableOption mkIf;
+  inherit (lib) mkEnableOption mkIf mkOption types;
 
   cfg = config.modulo.desktop;
 in {
   options.modulo.desktop = {
     enable = mkEnableOption "desktop support";
+
+    associations = mkOption {
+      type = types.attrsOf types.str;
+      default = {};
+      description = ''
+        Application associations with MIME types.
+      '';
+    };
   };
 
   imports = [
@@ -33,7 +41,11 @@ in {
     xdg = {
       enable = true;
       mime.enable = true;
-      mimeApps.enable = true;
+      mimeApps = {
+        enable = true;
+        associations.added = cfg.associations;
+        defaultApplications = cfg.associations;
+      };
     };
 
     home.packages = [
