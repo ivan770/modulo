@@ -153,82 +153,86 @@ in {
   ];
 
   config = mkIf cfg.enable {
-    systemd.network.networks = mapAttrs' (name: options: let
-      baseConfig = {
-        inherit name;
-        inherit (options) address;
+    systemd.network = {
+      networks = mapAttrs' (name: options: let
+        baseConfig = {
+          inherit name;
+          inherit (options) address;
 
-        enable = true;
+          enable = true;
 
-        networkConfig =
-          {
-            LLMNR = false;
-            MulticastDNS = false;
+          networkConfig =
+            {
+              LLMNR = false;
+              MulticastDNS = false;
 
-            LinkLocalAddressing = "ipv6";
-            IPv6AcceptRA = true;
-          }
-          // optionalAttrs options.wireless {
-            # Wireless networks may have an extended downtime period,
-            # so we wait for 5 seconds before losing carrier status for the current interface.
-            IgnoreCarrierLoss = "5s";
-          };
+              LinkLocalAddressing = "ipv6";
+              IPv6AcceptRA = true;
+            }
+            // optionalAttrs options.wireless {
+              # Wireless networks may have an extended downtime period,
+              # so we wait for 5 seconds before losing carrier status for the current interface.
+              IgnoreCarrierLoss = "5s";
+            };
 
-        linkConfig =
-          {
-            RequiredForOnline =
-              if (options.onlineStatus == null)
-              then "no"
-              else options.onlineStatus;
-          }
-          // optionalAttrs (isString options.macAddress) {
-            MACAddress = options.macAddress;
-          };
+          linkConfig =
+            {
+              RequiredForOnline =
+                if (options.onlineStatus == null)
+                then "no"
+                else options.onlineStatus;
+            }
+            // optionalAttrs (isString options.macAddress) {
+              MACAddress = options.macAddress;
+            };
 
-        ipv6AcceptRAConfig.DHCPv6Client = "always";
-      };
-
-      dhcpClient = optionalAttrs (options.dhcp == "client") {
-        networkConfig.DHCP = "yes";
-      };
-
-      localDns = optionalAttrs (options.dhcp == "client" && cfg.dns.private) {
-        dhcpV4Config.UseDNS = false;
-        dhcpV6Config.UseDNS = false;
-        ipv6AcceptRAConfig.UseDNS = false;
-      };
-
-      dhcpServer = optionalAttrs (options.dhcp == "server") {
-        networkConfig = {
-          DHCPServer = "yes";
-
-          # Assume that packet forwarding is required on interfaces
-          # that have DHCP server enabled.
-          IPMasquerade = "both";
+          ipv6AcceptRAConfig.DHCPv6Client = "always";
         };
 
-        dhcpServerConfig = let
-          EmitDNS = isString options.dhcpServer.dns;
-        in
-          {
-            inherit EmitDNS;
+        dhcpClient = optionalAttrs (options.dhcp == "client") {
+          networkConfig.DHCP = "yes";
+        };
 
-            PoolSize = options.dhcpServer.poolSize;
-            PoolOffset = options.dhcpServer.poolOffset;
-          }
-          // optionalAttrs EmitDNS {
-            DNS = options.dhcpServer.dns;
+        localDns = optionalAttrs (options.dhcp == "client" && cfg.dns.private) {
+          dhcpV4Config.UseDNS = false;
+          dhcpV6Config.UseDNS = false;
+          ipv6AcceptRAConfig.UseDNS = false;
+        };
+
+        dhcpServer = optionalAttrs (options.dhcp == "server") {
+          networkConfig = {
+            DHCPServer = "yes";
+
+            # Assume that packet forwarding is required on interfaces
+            # that have DHCP server enabled.
+            IPMasquerade = "both";
           };
-      };
-    in
-      nameValuePair (hashString "md5" name) (recursiveMerge [
-        baseConfig
-        dhcpClient
-        localDns
-        dhcpServer
-        options.extraConfig
-      ]))
-    cfg.interfaces;
+
+          dhcpServerConfig = let
+            EmitDNS = isString options.dhcpServer.dns;
+          in
+            {
+              inherit EmitDNS;
+
+              PoolSize = options.dhcpServer.poolSize;
+              PoolOffset = options.dhcpServer.poolOffset;
+            }
+            // optionalAttrs EmitDNS {
+              DNS = options.dhcpServer.dns;
+            };
+        };
+      in
+        nameValuePair (hashString "md5" name) (recursiveMerge [
+          baseConfig
+          dhcpClient
+          localDns
+          dhcpServer
+          options.extraConfig
+        ]))
+      cfg.interfaces;
+
+      wait-online.enable = false;
+    };
 
     # Use TCP BBR congestion control algorithm
     boot.kernel.sysctl = {
