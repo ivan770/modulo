@@ -43,5 +43,7 @@ in {
     };
 
     security.protectKernelImage = true;
+
+    environment.noXlibs = true;
   };
 }
