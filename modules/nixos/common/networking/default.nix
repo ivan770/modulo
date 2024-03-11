@@ -144,6 +144,50 @@ in {
         Supported network interfaces.
       '';
     };
+
+    keepalive = {
+      time = mkOption {
+        type = types.ints.positive;
+        default =
+          if config.modulo.headless.enable
+          then 600
+          else 7200;
+        defaultText = ''
+          if config.modulo.headless.enable then 600 else 7200;
+        '';
+        description = ''
+          Seconds to wait before sending keepalive probes for inactive TCP connections.
+        '';
+      };
+
+      interval = mkOption {
+        type = types.ints.positive;
+        default =
+          if config.modulo.headless.enable
+          then 60
+          else 75;
+        defaultText = ''
+          if config.modulo.headless.enable then 60 else 75;
+        '';
+        description = ''
+          Seconds to wait between each keepalive probe.
+        '';
+      };
+
+      probes = mkOption {
+        type = types.ints.positive;
+        default =
+          if config.modulo.headless.enable
+          then 5
+          else 9;
+        defaultText = ''
+          if config.modulo.headless.enable then 5 else 9;
+        '';
+        description = ''
+          The amount of probes to be sent before closing an inactive TCP connection.
+        '';
+      };
+    };
   };
 
   imports = [
@@ -234,10 +278,15 @@ in {
       wait-online.enable = false;
     };
 
-    # Use TCP BBR congestion control algorithm
     boot.kernel.sysctl = {
+      # Use TCP BBR congestion control algorithm
       "net.core.default_qdisc" = "fq";
       "net.ipv4.tcp_congestion_control" = "bbr";
+
+      # TCP keepalive configuration
+      "net.ipv4.tcp_keepalive_time" = cfg.keepalive.time;
+      "net.ipv4.tcp_keepalive_intvl" = cfg.keepalive.interval;
+      "net.ipv4.tcp_keepalive_probes" = cfg.keepalive.probes;
     };
 
     networking = {
