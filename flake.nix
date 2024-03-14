@@ -3,6 +3,7 @@
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
     home-manager.url = "github:nix-community/home-manager/release-23.11";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
@@ -14,9 +15,15 @@
 
     impermanence.url = "github:nix-community/impermanence";
 
+    flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
+    flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
       url = "github:snowfallorg/lib";
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils-plus.follows = "flake-utils-plus";
+        flake-compat.follows = "flake-compat";
+      };
     };
   };
 
