@@ -18,7 +18,8 @@
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
     flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
-      url = "github:snowfallorg/lib";
+      # FIXME: Migrate to the main branch
+      url = "github:snowfallorg/lib/dev";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils-plus.follows = "flake-utils-plus";

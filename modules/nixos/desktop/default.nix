@@ -32,7 +32,7 @@ in {
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = config.snowfallorg.user != {};
+        assertion = config.snowfallorg.users != {};
         message = ''
           At least one activated user is required to use the desktop configuration.
         '';
@@ -83,7 +83,7 @@ in {
         enable = true;
 
         settings = let
-          users = attrNames config.snowfallorg.user;
+          users = attrNames config.snowfallorg.users;
         in {
           default_session =
             if (length users) > 1
