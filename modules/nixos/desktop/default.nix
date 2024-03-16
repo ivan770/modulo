@@ -39,8 +39,6 @@ in {
       }
     ];
 
-    console.earlySetup = true;
-
     # Required for default system-wide fonts configuration.
     # See fonts.fontconfig.defaultFonts.* for more information.
     fonts.packages = builtins.attrValues {
@@ -57,14 +55,16 @@ in {
 
       kernelParams = [
         "quiet"
-        "rd.systemd.show_status=false"
-        "rd.udev.log_level=3"
-        "udev.log_priority=3"
+        "udev.log_level=3"
         "boot.shell_on_fail"
-
         "mitigations=off"
         "nowatchdog"
-        "nmi_watchdog=0"
+        "tsc=nowatchdog"
+      ];
+
+      blacklistedKernelModules = [
+        # AMD-specific hardware watchdog
+        "sp5100_tco"
       ];
 
       plymouth.enable = true;
