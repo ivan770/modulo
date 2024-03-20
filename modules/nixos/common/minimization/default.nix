@@ -13,4 +13,13 @@ _: {
 
   # journald has built-in log rotation capabilities
   services.logrotate.enable = false;
+
+  # Disable software that is already included with the Home Manager
+  xdg = {
+    autostart.enable = false;
+    icons.enable = false;
+    menus.enable = false;
+    mime.enable = false;
+    sounds.enable = false;
+  };
 }
