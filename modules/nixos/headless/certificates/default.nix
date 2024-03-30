@@ -25,15 +25,6 @@ in {
             '';
           };
 
-          environmentFile = mkOption {
-            type = types.nullOr types.path;
-            default = null;
-            description = ''
-              Path to file containing environment variables required
-              for DNS provider client functionality.
-            '';
-          };
-
           extraDomainNames = mkOption {
             type = types.nullOr (types.listOf types.str);
             default = null;
@@ -56,7 +47,9 @@ in {
       acceptTerms = true;
       certs =
         mapAttrs (domain: options: {
-          inherit (options) dnsProvider email environmentFile;
+          inherit (options) dnsProvider email;
+
+          environmentFile = config.modulo.secrets.values.dnsCredentials;
 
           extraDomainNames =
             if isList options.extraDomainNames
@@ -66,13 +59,21 @@ in {
         cfg.acme;
     };
 
-    modulo.impermanence.directories = [
-      {
+    modulo = {
+      impermanence.directories = [
+        {
+          inherit (config.security.acme.defaults) group;
+
+          directory = "/var/lib/acme";
+          user = config.users.users.acme.name;
+        }
+      ];
+
+      secrets.applications.dnsCredentials = {
         inherit (config.security.acme.defaults) group;
 
-        directory = "/var/lib/acme";
-        user = config.users.users.acme.name;
-      }
-    ];
+        owner = config.users.users.acme.name;
+      };
+    };
   };
 }

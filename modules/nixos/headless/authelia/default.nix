@@ -1,13 +1,14 @@
 {
   config,
   lib,
-  options,
   pkgs,
   ...
 }: let
   inherit
     (lib)
+    attrNames
     concatStringsSep
+    genAttrs
     getExe
     mapAttrs
     mapAttrsToList
@@ -23,28 +24,6 @@
 in {
   options.modulo.headless.authelia = {
     enable = mkEnableOption "Authelia authentication server";
-
-    # https://github.com/NixOS/nixpkgs/blob/5de0b32be6e85dc1a9404c75131316e4ffbc634c/nixos/modules/services/security/authelia.nix#L70-L110
-    jwtSecretFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to your JWT secret used during identity verificaton.
-      '';
-    };
-
-    oidcIssuerPrivateKeyFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to your private key file used to encrypt OIDC JWTs.
-      '';
-    };
-
-    storageEncryptionKeyFile = mkOption {
-      type = types.path;
-      description = ''
-        Path to your storage encryption key.
-      '';
-    };
 
     host = mkOption {
       type = types.str;
@@ -83,13 +62,6 @@ in {
             type = types.str;
             description = ''
               User e-mail address.
-            '';
-          };
-
-          passwordFile = mkOption {
-            type = types.path;
-            description = ''
-              Path to user's password value.
             '';
           };
         };
@@ -142,9 +114,10 @@ in {
     services.authelia.instances.main = {
       enable = true;
 
-      secrets = {
-        inherit (cfg) jwtSecretFile oidcIssuerPrivateKeyFile storageEncryptionKeyFile;
-      };
+      secrets =
+        genAttrs
+        ["jwtSecretFile" "oidcIssuerPrivateKeyFile" "storageEncryptionKeyFile"]
+        (name: config.modulo.secrets.values."authelia/${name}");
 
       settings = {
         theme = "dark";
@@ -197,10 +170,10 @@ in {
 
       usersReplaceSecretInvocation = concatStringsSep "\n" (
         mapAttrsToList
-        (user: {passwordFile, ...}: ''
+        (user: _: ''
           ${getExe pkgs.replace-secret} \
             "^${user}Password^" \
-            "${passwordFile}" \
+            "${config.modulo.secrets.values."authelia/users/${user}"}" \
             ${usersConfig}
         '')
         cfg.users
@@ -256,6 +229,12 @@ in {
           group = "authelia-main";
         }
       ];
+
+      secrets.applications =
+        genAttrs
+        (["authelia/jwtSecretFile" "authelia/oidcIssuerPrivateKeyFile" "authelia/storageEncryptionKeyFile"]
+          ++ map (user: "authelia/users/${user}") (attrNames cfg.users))
+        (_: {owner = config.services.authelia.instances.main.user;});
     };
   });
 }
