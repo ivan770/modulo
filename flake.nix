@@ -9,7 +9,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     disko = {
-      url = "github:nix-community/disko";
+      url = "github:nix-community/disko/v1.5.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

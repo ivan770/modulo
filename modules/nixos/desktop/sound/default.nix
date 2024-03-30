@@ -22,12 +22,7 @@ in {
   config = mkIf cfg.enable {
     services.pipewire = {
       enable = true;
-
-      alsa = {
-        enable = true;
-        support32Bit = true;
-      };
-
+      alsa.enable = true;
       pulse.enable = true;
     };
 
