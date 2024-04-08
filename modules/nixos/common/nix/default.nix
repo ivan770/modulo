@@ -18,6 +18,7 @@ in {
 
     settings = {
       auto-optimise-store = true;
+      flake-registry = "";
       trusted-users = [
         "root"
         "@wheel"
