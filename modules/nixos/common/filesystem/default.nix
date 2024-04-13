@@ -289,6 +289,8 @@ in {
           "defaults"
           "size=${cfg.root.size}"
           "mode=755"
+          "nodev"
+          "nosuid"
         ];
       };
     };
