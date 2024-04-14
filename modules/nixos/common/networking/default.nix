@@ -289,27 +289,36 @@ in {
       "net.ipv4.tcp_keepalive_probes" = cfg.keepalive.probes;
 
       # Ignore incoming ICMP redirects
-      "net.ipv4.conf.all.accept_redirects" = 0;
-      "net.ipv4.conf.default.accept_redirects" = 0;
-      "net.ipv4.conf.all.secure_redirects" = 0;
-      "net.ipv4.conf.default.secure_redirects" = 0;
-      "net.ipv6.conf.all.accept_redirects" = 0;
-      "net.ipv6.conf.default.accept_redirects" = 0;
+      "net.ipv4.conf.all.accept_redirects" = false;
+      "net.ipv4.conf.default.accept_redirects" = false;
+      "net.ipv4.conf.all.secure_redirects" = false;
+      "net.ipv4.conf.default.secure_redirects" = false;
+      "net.ipv6.conf.all.accept_redirects" = false;
+      "net.ipv6.conf.default.accept_redirects" = false;
 
       # Disable outgoing ICMP redirects
-      "net.ipv4.conf.all.send_redirects" = 0;
-      "net.ipv4.conf.default.send_redirects" = 0;
+      "net.ipv4.conf.all.send_redirects" = false;
+      "net.ipv4.conf.default.send_redirects" = false;
+
+      # Disable "source routing"
+      "net.ipv4.conf.all.accept_source_route" = false;
+      "net.ipv4.conf.default.accept_source_route" = false;
+      "net.ipv6.conf.all.accept_source_route" = false;
+      "net.ipv6.conf.default.accept_source_route" = false;
 
       # Ignore incoming ICMP echo requests
-      "net.ipv4.icmp_echo_ignore_all" = 1;
-      "net.ipv6.icmp.echo_ignore_all" = 1;
+      "net.ipv4.icmp_echo_ignore_all" = true;
+      "net.ipv6.icmp.echo_ignore_all" = true;
 
       # RFC 3704 (strict reverse path filtering)
       "net.ipv4.conf.all.rp_filter" = 1;
       "net.ipv4.conf.default.rp_filter" = 1;
 
       # RFC 1337 (TCP time-wait assassination)
-      "net.ipv4.tcp_rfc1337" = 1;
+      "net.ipv4.tcp_rfc1337" = true;
+
+      # SYN flood attacks prevention
+      "net.ipv4.tcp_syncookies" = true;
     };
 
     networking = {
