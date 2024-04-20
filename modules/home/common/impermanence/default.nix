@@ -33,12 +33,10 @@ in {
         ".cache/nix"
 
         # .*
-        ".cargo"
         {
           directory = ".pki";
           mode = "0700";
         }
-        ".rustup"
 
         # .config/*
         {

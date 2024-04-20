@@ -71,8 +71,6 @@ in {
           "/var/lib/nixos"
           "/var/lib/systemd"
           "/var/log"
-
-          # /var/tmp implies a temporary file on a... persistent storage?
           {
             directory = "/var/tmp";
             mode = "0777";
