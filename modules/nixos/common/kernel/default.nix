@@ -16,8 +16,8 @@ _: {
       # https://bugzilla.redhat.com/show_bug.cgi?id=2055118
       "page_alloc.shuffle=1"
 
-      # https://en.wikipedia.org/wiki/Linux_kernel_oops
-      "oops=panic"
+      # Legacy feature
+      "vsyscall=none"
     ];
   };
 
