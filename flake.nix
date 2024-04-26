@@ -51,7 +51,7 @@
         inherit (channels.nixpkgs) alejandra deadnix lib runCommand statix;
         inherit (lib) getExe;
       in {
-        formatter = channels.nixpkgs.alejandra;
+        formatter = alejandra;
 
         checks = let
           mkCheck = linter:

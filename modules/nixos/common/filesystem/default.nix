@@ -150,7 +150,6 @@ in {
             format = "ext4";
             mountOptions =
               [
-                "defaults"
                 "noatime"
                 "commit=30"
               ]
@@ -173,7 +172,6 @@ in {
             format = "f2fs";
             mountOptions =
               [
-                "defaults"
                 "compress_algorithm=zstd:6"
                 "compress_chksum"
                 "atgc"
@@ -248,9 +246,7 @@ in {
 
                   type = "filesystem";
                   format = "vfat";
-                  mountOptions = [
-                    "defaults"
-                  ];
+                  mountOptions = ["umask=0077"];
                 };
               };
               DATA = let
@@ -286,7 +282,6 @@ in {
       nodev."/" = {
         fsType = "tmpfs";
         mountOptions = [
-          "defaults"
           "size=${cfg.root.size}"
           "mode=755"
           "nodev"
