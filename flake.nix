@@ -23,6 +23,9 @@
       };
     };
 
+    nix-colors.url = "github:Misterio77/nix-colors";
+    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
+
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
     flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
