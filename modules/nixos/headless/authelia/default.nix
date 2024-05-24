@@ -207,12 +207,10 @@ in {
         cfg.oidc.clients
       );
     in ''
-      # Users config file generation
       cp ${usersPlaceholder} ${usersConfig}
       chmod 0600 ${usersConfig}
       ${usersReplaceSecretInvocation}
 
-      # Clients config file generation
       cp ${clientsPlaceholder} ${clientsConfig}
       chmod 0600 ${clientsConfig}
       ${clientsReplaceSecretInvocation}

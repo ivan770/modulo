@@ -56,11 +56,19 @@ in {
       }
     ];
 
-    # Coredumps are unused in this configuration anyway.
+    # FIXME: https://github.com/NixOS/nixpkgs/issues/311125
+    # FIXME: https://github.com/NixOS/nixpkgs/issues/311665
+    # system.etc.overlay = {
+    #   enable = true;
+    #   mutable = true;
+    # };
+
+    # Coredumps are unused in this configuration.
     systemd.coredump.extraConfig = ''
       Storage=none
     '';
 
+    # FIXME: Enable systemd-sysusers?
     users.mutableUsers = false;
 
     environment.persistence.${cfg.persistentDirectory} = {

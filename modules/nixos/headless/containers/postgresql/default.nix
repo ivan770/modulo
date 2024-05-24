@@ -28,13 +28,18 @@ in {
       ...
     }: {
       services.postgresql = {
-        inherit package settings;
+        inherit package;
 
         enable = true;
         dataDir = "${dataDir}/${package.psqlSchema}";
 
+        settings =
+          {
+            port = exposedServices.main;
+          }
+          // settings;
+
         enableTCPIP = true;
-        port = exposedServices.main;
 
         ensureUsers =
           map (name: {

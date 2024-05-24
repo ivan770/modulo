@@ -12,11 +12,13 @@
     length
     mapAttrs
     mapAttrs'
+    mapAttrsToList
     mkEnableOption
     mkIf
     mkOption
     nameValuePair
     optional
+    removePrefix
     replaceStrings
     types
     ;
@@ -82,6 +84,14 @@ in {
             });
             description = ''
               LVM pool configuration.
+            '';
+          };
+
+          ioScheduler = mkOption {
+            type = types.str;
+            default = "none";
+            description = ''
+              IO scheduler used for this disk.
             '';
           };
         };
@@ -290,6 +300,16 @@ in {
       };
     };
 
-    services.udisks2.enable = mkIf cfg.udisks2 true;
+    services = {
+      udev.extraRules = let
+        rules =
+          mapAttrsToList
+          (name: {ioScheduler, ...}: ''ACTION=="add|change", KERNEL=="${removePrefix "/dev/" name}", ATTR{queue/scheduler}="${ioScheduler}"'')
+          cfg.disks;
+      in
+        concatStringsSep "\n" rules;
+
+      udisks2.enable = mkIf cfg.udisks2 true;
+    };
   };
 }

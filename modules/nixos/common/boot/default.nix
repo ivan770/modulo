@@ -3,21 +3,11 @@
   config,
   ...
 }: let
-  inherit (lib) mkIf mkMerge mkOption types;
+  inherit (lib) mkOption types;
 
   cfg = config.modulo.boot;
 in {
   options.modulo.boot = {
-    type = mkOption {
-      type = types.enum [
-        "systemd-boot"
-        "generic-extlinux-compatible"
-      ];
-      description = ''
-        Bootloader used for the current configuration.
-      '';
-    };
-
     timeout = mkOption {
       type = types.ints.unsigned;
       default = 0;
@@ -33,41 +23,25 @@ in {
     };
   };
 
-  config.boot = let
-    configurationLimit = 5;
-  in
-    mkMerge [
-      {
-        loader = {
-          inherit (cfg) timeout;
+  config.boot = {
+    loader = {
+      inherit (cfg) timeout;
 
-          grub.enable = false;
-        };
+      efi = {
+        canTouchEfiVariables = true;
+        efiSysMountPoint = cfg.systemd-boot.mountpoint;
+      };
 
-        initrd.systemd.enable = true;
-      }
-      (mkIf (cfg.type == "systemd-boot") {
-        loader = {
-          efi = {
-            canTouchEfiVariables = true;
-            efiSysMountPoint = cfg.systemd-boot.mountpoint;
-          };
+      grub.enable = false;
 
-          systemd-boot = {
-            inherit configurationLimit;
+      systemd-boot = {
+        enable = true;
+        editor = false;
+        consoleMode = "max";
+        configurationLimit = 5;
+      };
+    };
 
-            enable = true;
-            editor = false;
-            consoleMode = "max";
-          };
-        };
-      })
-      (mkIf (cfg.type == "generic-extlinux-compatible") {
-        loader.generic-extlinux-compatible = {
-          inherit configurationLimit;
-
-          enable = true;
-        };
-      })
-    ];
+    initrd.systemd.enable = true;
+  };
 }

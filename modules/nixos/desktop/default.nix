@@ -47,11 +47,14 @@ in {
 
     hardware.opengl.enable = true;
 
-    xdg.portal.enable = true;
-
     boot = {
       consoleLogLevel = 0;
       initrd.verbose = false;
+
+      kernel.sysctl = {
+        # https://github.com/FeralInteractive/gamemode/issues/425
+        "kernel.split_lock_mitigate" = 0;
+      };
 
       kernelParams = [
         "quiet"
@@ -60,6 +63,7 @@ in {
         "mitigations=off"
         "nowatchdog"
         "tsc=nowatchdog"
+        "audit=0"
       ];
 
       blacklistedKernelModules = [
@@ -78,6 +82,9 @@ in {
         implementation = "broker";
         packages = [pkgs.gcr];
       };
+
+      # Activated by greetd by default.
+      displayManager.enable = false;
 
       greetd = {
         enable = true;

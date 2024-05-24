@@ -18,7 +18,7 @@ in {
       enable = true;
       powerOnBoot = cfg.onStartup;
 
-      # Required to acquire battery status of connected devices
+      # Required to acquire the battery status of connected devices
       package = pkgs.bluez5-experimental;
       settings.General.Experimental = true;
     };

@@ -267,7 +267,7 @@ in {
                   return 204;
                 '';
 
-                # Requests with OPTIONS method are be handled even if the CORS configuration is empty
+                # Requests with OPTIONS method have to be handled even if the CORS configuration is empty
                 mkMethodConfig = method: ''
                   if ($request_method = '${method}') {
                     ${sharedConfig}

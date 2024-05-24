@@ -16,14 +16,16 @@ on my own devices.
 Include Modulo as a flake input in your system configuration:
 
 ```nix
-modulo = {
-  url = "github:ivan770/modulo";
+inputs = {
+  modulo.url = "github:ivan770/modulo";
 
   # Optional, but highly recommended.
-  inputs = {
-    nixpkgs.follows = "nixpkgs";
-    snowfall.follows = "snowfall";
-  };
+  nixpkgs.follows = "modulo/nixpkgs";
+  unstable.follows = "modulo/unstable";
+  home-manager.follows = "modulo/home-manager";
+  snowfall.follows = "modulo/snowfall";
+
+  # ...
 };
 ```
 

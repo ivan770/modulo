@@ -2,14 +2,14 @@
   description = "NixOS modules collection";
 
   inputs = {
-    nixpkgs.url = "github:NixOS/nixpkgs/nixos-23.11";
+    nixpkgs.url = "github:NixOS/nixpkgs/nixos-24.05";
     unstable.url = "github:NixOS/nixpkgs/nixos-unstable";
 
-    home-manager.url = "github:nix-community/home-manager/release-23.11";
+    home-manager.url = "github:nix-community/home-manager/release-24.05";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     disko = {
-      url = "github:nix-community/disko/v1.5.0";
+      url = "github:nix-community/disko/v1.6.1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -29,8 +29,7 @@
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
     flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
-      # FIXME: Migrate to the main branch
-      url = "github:snowfallorg/lib/dev";
+      url = "github:snowfallorg/lib";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils-plus.follows = "flake-utils-plus";
@@ -40,7 +39,6 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     snowfall,
     ...
@@ -50,23 +48,8 @@
 
       src = ./.;
 
-      outputs-builder = channels: let
-        inherit (channels.nixpkgs) alejandra deadnix lib runCommand statix;
-        inherit (lib) getExe;
-      in {
-        formatter = alejandra;
-
-        checks = let
-          mkCheck = linter:
-            runCommand "lint" {} ''
-              ${linter} 2>&1
-              touch $out
-            '';
-        in {
-          fmt-check = mkCheck "${getExe alejandra} -c ${self}";
-          statix = mkCheck "${getExe statix} check ${self}";
-          deadnix = mkCheck "${getExe deadnix} -f ${self}";
-        };
+      outputs-builder = channels: {
+        formatter = channels.nixpkgs.alejandra;
       };
 
       snowfall = {

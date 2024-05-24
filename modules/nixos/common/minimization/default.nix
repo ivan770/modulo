@@ -8,6 +8,9 @@ _: {
     nixos.enable = false;
   };
 
+  # Disable linked libraries assistance on non-Nix binary invocation
+  environment.stub-ld.enable = false;
+
   # Disable package search on a missing command
   programs.command-not-found.enable = false;
 

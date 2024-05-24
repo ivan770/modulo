@@ -6,12 +6,12 @@ in {
   security = {
     doas = {
       enable = true;
-      # Force to override the default "wheel" group configuration.
+      # Force override the default "wheel" group configuration.
       extraRules = mkForce [
         {
           groups = ["wheel"];
           keepEnv = true;
-          # Fix missing git binary error when rebuilding system configuration
+          # Fix missing git binary error when rebuilding the system configuration
           setEnv = ["PATH"];
         }
       ];

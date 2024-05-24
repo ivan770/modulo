@@ -10,6 +10,7 @@ _: {
       "kernel.ftrace_enabled" = false;
       "kernel.dmesg_restrict" = true;
       "kernel.unprivileged_bpf_disabled" = 1;
+      "kernel.yama.ptrace_scope" = 2;
     };
 
     kernelParams = [
@@ -18,6 +19,9 @@ _: {
 
       # Legacy feature
       "vsyscall=none"
+
+      # Debugfs is unused in this configuration
+      "debugfs=off"
     ];
   };
 

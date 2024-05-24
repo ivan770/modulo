@@ -4,6 +4,7 @@ _: {
 
     startWhenNeeded = true;
     allowSFTP = false;
+    authorizedKeysInHomedir = false;
 
     settings = {
       AllowStreamLocalForwarding = false;
