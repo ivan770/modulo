@@ -29,7 +29,7 @@
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
     flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
-      url = "github:snowfallorg/lib";
+      url = "github:snowfallorg/lib/v3.0.2";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils-plus.follows = "flake-utils-plus";
