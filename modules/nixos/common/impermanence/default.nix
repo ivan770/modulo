@@ -33,6 +33,7 @@ in {
       '';
     };
 
+    # FIXME: Replace with automatic HM discovery
     useHomeManager = mkEnableOption "home-manager impermanence support";
   };
 

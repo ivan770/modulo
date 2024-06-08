@@ -230,6 +230,7 @@ in {
               MACAddress = options.macAddress;
             };
 
+          # FIXME: Is DHCPv6 really necessary?
           ipv6AcceptRAConfig.DHCPv6Client = "always";
         };
 

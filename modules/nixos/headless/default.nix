@@ -1,5 +1,17 @@
-{lib, ...}: {
+{
+  config,
+  lib,
+  ...
+}: let
+  inherit (lib) mkEnableOption mkIf;
+
+  cfg = config.modulo.headless;
+in {
   options.modulo.headless = {
-    enable = lib.mkEnableOption "generic headless configuration";
+    enable = mkEnableOption "generic headless configuration";
+  };
+
+  config = mkIf cfg.enable {
+    security.lockKernelModules = true;
   };
 }
