@@ -4,14 +4,13 @@
   lib,
   ...
 }: let
-  inherit (lib) isString mapAttrs mkEnableOption mkIf mkOption types;
+  inherit (lib) mapAttrs mkOption types;
 
   cfg = config.modulo.impermanence;
 in {
   options.modulo.impermanence = {
     persistentDirectory = mkOption {
-      type = types.nullOr types.str;
-      default = null;
+      type = types.str;
       description = ''
         Directory that will be used to store persistent files.
       '';
@@ -32,16 +31,13 @@ in {
         Application-specific persistent files.
       '';
     };
-
-    # FIXME: Replace with automatic HM discovery
-    useHomeManager = mkEnableOption "home-manager impermanence support";
   };
 
   imports = [
     inputs.impermanence.nixosModules.impermanence
   ];
 
-  config = mkIf (isString cfg.persistentDirectory) {
+  config = {
     # sops-nix executes secretsForUsers before impermanence module activation,
     # leading to incorrect user password provision on startup.
     # To fix this behaviour, host keys can be simply moved to persistent directory explicitly.
@@ -93,9 +89,10 @@ in {
         ]
         ++ cfg.files;
 
-      users = mkIf cfg.useHomeManager (mapAttrs
+      users =
+        mapAttrs
         (_: modules: modules.modulo.home-impermanence)
-        config.home-manager.users);
+        config.home-manager.users;
     };
   };
 }
