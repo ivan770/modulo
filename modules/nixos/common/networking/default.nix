@@ -230,6 +230,10 @@ in {
               MACAddress = options.macAddress;
             };
 
+          # By default, networks managed by networkd use noqueue.
+          # Most Linux distros use fq-codel by default.
+          fairQueueingControlledDelayConfig.Parent = "root";
+
           # FIXME: Is DHCPv6 really necessary?
           ipv6AcceptRAConfig.DHCPv6Client = "always";
         };
@@ -280,9 +284,9 @@ in {
     };
 
     boot.kernel.sysctl = {
-      # Use TCP BBR congestion control algorithm
-      "net.core.default_qdisc" = "fq";
-      "net.ipv4.tcp_congestion_control" = "bbr";
+      # Network congestion configuration
+      "net.ipv4.tcp_congestion_control" = "cubic";
+      "net.ipv4.tcp_ecn" = 1;
 
       # TCP keepalive configuration
       "net.ipv4.tcp_keepalive_time" = cfg.keepalive.time;
