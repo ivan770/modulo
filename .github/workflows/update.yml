@@ -1,21 +1,22 @@
-name: Update
+name: Update flake inputs
+
 on:
   workflow_dispatch:
   schedule:
-    - cron: '0 0 * * 0'
+    - cron: "0 0 * * 0"
 
 jobs:
   lockfile:
-    name: "Update flake.lock"
+    name: Update flake.lock
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v8
+        uses: DeterminateSystems/nix-installer-action@v12
       - name: Update flake.lock
         id: update
-        uses: DeterminateSystems/update-flake-lock@v20
+        uses: DeterminateSystems/update-flake-lock@v22
         with:
           pr-title: "Update flake.lock"
           pr-body: |
