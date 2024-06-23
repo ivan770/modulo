@@ -48,6 +48,16 @@ in {
             '';
           };
 
+          dhcpClient = {
+            dns = mkOption {
+              type = types.bool;
+              default = true;
+              description = ''
+                Whether to use DNS server information received from DHCP server.
+              '';
+            };
+          };
+
           dhcpServer = {
             poolSize = mkOption {
               type = types.ints.positive;
@@ -242,7 +252,7 @@ in {
           networkConfig.DHCP = "yes";
         };
 
-        localDns = optionalAttrs (options.dhcp == "client" && cfg.dns.private) {
+        linkDNS = optionalAttrs (options.dhcp == "client" && !options.dhcpClient.dns) {
           dhcpV4Config.UseDNS = false;
           dhcpV6Config.UseDNS = false;
           ipv6AcceptRAConfig.UseDNS = false;
@@ -274,7 +284,7 @@ in {
         nameValuePair (hashString "md5" name) (recursiveMerge [
           baseConfig
           dhcpClient
-          localDns
+          linkDNS
           dhcpServer
           options.extraConfig
         ]))
