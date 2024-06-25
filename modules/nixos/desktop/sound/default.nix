@@ -11,13 +11,9 @@ in {
     enable = mkEnableOption "audio playback support";
   };
 
-  config = mkIf cfg.enable {
-    services.pipewire = {
-      enable = true;
-      alsa.enable = true;
-      pulse.enable = true;
-    };
-
-    security.rtkit.enable = true;
+  config.services.pipewire = mkIf cfg.enable {
+    enable = true;
+    alsa.enable = true;
+    pulse.enable = true;
   };
 }

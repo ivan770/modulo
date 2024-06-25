@@ -39,6 +39,31 @@ in {
       }
     ];
 
+    # Required for Pipewire and Sway to acquire realtime capabilities.
+    #
+    # Modulo relies on user services for Pipewire activation,
+    # so the "audio" group is not used here.
+    security.pam.loginLimits = [
+      {
+        domain = "@users";
+        type = "-";
+        item = "memlock";
+        value = "unlimited";
+      }
+      {
+        domain = "@users";
+        type = "-";
+        item = "rtprio";
+        value = "99";
+      }
+      {
+        domain = "@users";
+        type = "-";
+        item = "nice";
+        value = "-19";
+      }
+    ];
+
     # Required for default system-wide fonts configuration.
     # See fonts.fontconfig.defaultFonts.* for more information.
     fonts.packages = builtins.attrValues {
