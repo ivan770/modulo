@@ -23,6 +23,9 @@
       };
     };
 
+    nixpak.url = "github:nixpak/nixpak";
+    nixpak.inputs.nixpkgs.follows = "nixpkgs";
+
     nix-colors.url = "github:Misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 
