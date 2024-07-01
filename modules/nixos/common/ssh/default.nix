@@ -13,7 +13,8 @@ _: {
       ClientAliveCountMax = 0;
       KbdInteractiveAuthentication = false;
       LogLevel = "ERROR";
-      LoginGraceTime = 30;
+      # FIXME: https://github.com/NixOS/nixpkgs/pull/323753
+      LoginGraceTime = 0;
       MaxAuthTries = 2;
       PasswordAuthentication = false;
       PermitRootLogin = "no";
