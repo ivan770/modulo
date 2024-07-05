@@ -1,5 +1,5 @@
 {lib, ...}: final: _: let
-  inherit (lib) attrsets mapAttrs splitString substituteDeps;
+  inherit (lib) attrsets mapAttrs splitString;
 in {
   substituteDeps = package: attrs:
     package.override (
@@ -10,7 +10,7 @@ in {
           attrsets.attrByPath
           path (
             attrsets.attrByPath
-            path (substituteDeps drv attrs)
+            path (final.substituteDeps drv attrs)
             final
           )
           attrs
