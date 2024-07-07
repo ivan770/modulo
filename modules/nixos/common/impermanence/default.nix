@@ -53,20 +53,25 @@ in {
       }
     ];
 
-    # FIXME: https://github.com/NixOS/nixpkgs/issues/311125
-    # FIXME: https://github.com/NixOS/nixpkgs/issues/311665
-    # system.etc.overlay = {
-    #   enable = true;
-    #   mutable = true;
-    # };
+    system.etc.overlay = {
+      enable = true;
+      mutable = true;
+    };
 
-    # Coredumps are unused in this configuration.
-    systemd.coredump.extraConfig = ''
-      Storage=none
-    '';
+    systemd = {
+      # Coredumps are unused in this configuration.
+      coredump.extraConfig = ''
+        Storage=none
+      '';
 
-    # FIXME: Enable systemd-sysusers?
-    users.mutableUsers = false;
+      sysusers.enable = true;
+    };
+
+    # This is required by sops-nix due to the immutable sysusers implementation.
+    # When set to `false`, sysusers data is generated during the system build process
+    # and embedded within the final etc overlay, preventing user password modification
+    # by sops-nix.
+    users.mutableUsers = true;
 
     environment.persistence.${cfg.persistentDirectory} = {
       hideMounts = true;
