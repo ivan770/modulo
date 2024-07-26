@@ -64,14 +64,11 @@ in {
         Storage=none
       '';
 
-      sysusers.enable = true;
+      # FIXME: https://github.com/NixOS/nixpkgs/pull/328926
+      # sysusers.enable = true;
     };
 
-    # This is required by sops-nix due to the immutable sysusers implementation.
-    # When set to `false`, sysusers data is generated during the system build process
-    # and embedded within the final etc overlay, preventing user password modification
-    # by sops-nix.
-    users.mutableUsers = true;
+    users.mutableUsers = false;
 
     environment.persistence.${cfg.persistentDirectory} = {
       hideMounts = true;
