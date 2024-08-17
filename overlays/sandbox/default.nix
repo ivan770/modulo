@@ -4,7 +4,6 @@
   ...
 }: _: pkgs: {
   mkNixPak = inputs.nixpak.lib.nixpak {
-    inherit pkgs;
-    inherit (pkgs) lib;
+    inherit lib pkgs;
   };
 }
