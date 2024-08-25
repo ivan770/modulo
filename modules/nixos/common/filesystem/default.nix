@@ -272,11 +272,7 @@ in {
                   else content;
               in {
                 label = "DATA";
-                start =
-                  if options.boot.enable
-                  then options.boot.size
-                  else "1MiB";
-                end = "100%";
+                size = "100%";
                 content = wrapLUKS {
                   type = "lvm_pv";
                   vg = mkVolumeGroupName device;
