@@ -217,7 +217,7 @@ in {
     '';
 
     modulo = {
-      headless.nginx.upstreams.authelia = "${cfg.host}:${builtins.toString cfg.port}";
+      headless.nginx.upstreams.authelia = "${cfg.host}:${toString cfg.port}";
 
       impermanence.directories = [
         {

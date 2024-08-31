@@ -78,7 +78,7 @@ in {
               extendedConfig = isAttrs portConfig;
 
               port =
-                builtins.toString
+                toString
                 (
                   if extendedConfig
                   then portConfig.name

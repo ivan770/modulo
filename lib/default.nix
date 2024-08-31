@@ -22,9 +22,9 @@
       or consts.${name};
   in
     concatStrings [
-      (builtins.toString prefix)
+      (toString prefix)
       source
-      (builtins.toString transparency)
+      (toString transparency)
     ];
 in {
   inherit mkColor;
