@@ -122,6 +122,14 @@ in {
                     '';
                   };
 
+                  type = mkOption {
+                    type = enum ["tcp" "udp"];
+                    default = "tcp";
+                    description = ''
+                      Port type (TCP or UDP).
+                    '';
+                  };
+
                   rateLimit = mkOption {
                     type = nullOr str;
                     default = null;
@@ -203,6 +211,7 @@ in {
   imports = [
     ./dns.nix
     ./firewall.nix
+    ./wireguard.nix
     ./wireless.nix
   ];
 

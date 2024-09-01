@@ -85,6 +85,11 @@ in {
                   else portConfig
                 );
 
+              type =
+                if extendedConfig
+                then portConfig.type
+                else "tcp";
+
               rateLimiter = optionalString (extendedConfig && portConfig.rateLimit != null) ''
                 ct state new \
                   iifname ${name} \
@@ -95,7 +100,7 @@ in {
               '';
             in ''
               ${rateLimiter}
-              iifname ${name} tcp dport ${port} accept
+              iifname ${name} ${type} dport ${port} accept
             '')))
           flatten
           (concatStringsSep "\n")
