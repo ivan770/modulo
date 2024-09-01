@@ -140,7 +140,7 @@ in {
                   };
                 };
               })));
-            default = ["ssh"];
+            default = [];
             description = ''
               Public services exposed via the current interface.
               You may optionally use attrs syntax to define additional parameters

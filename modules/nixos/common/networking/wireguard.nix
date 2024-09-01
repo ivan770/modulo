@@ -87,6 +87,8 @@ in {
         ];
       };
 
+      boot.kernelModules = ["nft_masq"];
+
       modulo = {
         # FIXME: Add IPv6 support
         networking.interfaces.wg0 = {
