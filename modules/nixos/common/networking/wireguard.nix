@@ -87,15 +87,12 @@ in {
         ];
       };
 
-      boot.kernelModules = ["nft_masq"];
-
       modulo = {
         # FIXME: Add IPv6 support
         networking.interfaces.wg0 = {
           dhcp = null;
           address = ["${cfg.mesh.${hostname}.address}/16"];
           onlineStatus = null;
-          extraConfig.networkConfig.IPMasquerade = "ipv4";
         };
 
         secrets.applications."wireguard/${hostname}" = {
