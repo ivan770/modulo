@@ -111,6 +111,11 @@ in {
           (filterAttrs (_: any (port: isAttrs port && port.rateLimit != null)))
           (val: val != {})
         ];
+
+        mkRelayForwardingRule = rule:
+          optionalString
+          config.modulo.networking.wireguard.actsAsRelay
+          "iifname wg0 oifname wg0 ${rule}";
       in {
         family = "inet";
 
@@ -165,12 +170,18 @@ in {
             # Forward cross-container packets
             ${crossContainer}
 
+            # Allow WireGuard forwarding if the current host is acting as a relay
+            ${mkRelayForwardingRule "accept"}
+
             # Accept packets that interact with the forwarded interfaces
             ${mkForwardedInterfacesInputRule "accept"}
           }
 
           chain postrouting {
             type nat hook postrouting priority 100; policy accept;
+
+            # Enable WireGuard interface IP masquerade
+            ${mkRelayForwardingRule "masquerade random"}
 
             # Enable forwarded interfaces IP masquerade
             ${mkForwardedInterfacesInputRule "masquerade random"}
