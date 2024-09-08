@@ -1,4 +1,4 @@
-_: {
+{lib, ...}: {
   # Usually Git is installed user-wide and repositories
   # are created without being "shared", leading to
   # "repository not owned by current user" errors.
@@ -10,4 +10,18 @@ _: {
     [safe]
       directory = "*"
   '';
+
+  # Delegate all systemd-logind actions to WMs
+  services.logind =
+    lib.modulo.recursiveMerge (
+      map
+      (button: {
+        "${button}Key" = "ignore";
+        "${button}KeyLongPress" = "ignore";
+      })
+      ["hibernate" "power" "reboot" "suspend"]
+    )
+    // {
+      lidSwitch = "ignore";
+    };
 }

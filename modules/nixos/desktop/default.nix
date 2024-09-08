@@ -134,9 +134,6 @@ in {
             };
         };
       };
-
-      # Delegate lid switch suspend to WM
-      logind.lidSwitch = "ignore";
     };
   };
 }
