@@ -11,9 +11,11 @@
     filterAttrs
     flatten
     hasAttr
+    listToAttrs
     mapAttrsToList
     mkOption
     mkIf
+    nameValuePair
     pipe
     types
     ;
@@ -25,6 +27,14 @@ in {
       type = types.str;
       description = ''
         IPv6 ULA CIDR value used for routing intra-network traffic.
+      '';
+    };
+
+    addToHosts = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Whether to add mesh members to /etc/hosts.
       '';
     };
 
@@ -183,6 +193,15 @@ in {
 
       boot.kernel.sysctl."net.ipv6.conf.all.forwarding" =
         mkIf cfg.actsAsRelay true;
+
+      networking.hosts = mkIf cfg.addToHosts (pipe cfg.mesh [
+        (mapAttrsToList (_: {nodes, ...}:
+          mapAttrsToList
+          (node: {address, ...}: nameValuePair address ["${node}.lan"])
+          nodes))
+        flatten
+        listToAttrs
+      ]);
 
       modulo = {
         networking = {
