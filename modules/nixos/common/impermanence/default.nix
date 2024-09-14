@@ -36,7 +36,7 @@ in {
 
     # Nix can quickly drain the entire root tmpfs during the build process,
     # so the build directory has to be moved to a persistent storage.
-    systemd.services.nix-daemon.environment.TMPDIR = "/var/tmp";
+    nix.settings.build-dir = "/var/tmp";
 
     system.etc.overlay = mkIf cfg.experimental {
       enable = true;
