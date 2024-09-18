@@ -12,6 +12,15 @@ in {
   };
 
   config = mkIf cfg.enable {
+    assertions = [
+      {
+        assertion = !config.modulo.desktop.enable;
+        message = ''
+          Desktop and headless configurations are mutually exclusive.
+        '';
+      }
+    ];
+
     security.lockKernelModules = true;
   };
 }

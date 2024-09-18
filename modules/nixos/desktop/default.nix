@@ -37,6 +37,12 @@ in {
           At least one activated user is required to use the desktop configuration.
         '';
       }
+      {
+        assertion = !config.modulo.headless.enable;
+        message = ''
+          Desktop and headless configurations are mutually exclusive.
+        '';
+      }
     ];
 
     # Required for Pipewire and Sway to acquire realtime capabilities.

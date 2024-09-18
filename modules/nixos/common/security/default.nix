@@ -1,22 +1,15 @@
-{lib, ...}: let
-  inherit (lib) mkForce;
-in {
-  environment.defaultPackages = mkForce [];
+{
+  lib,
+  pkgs,
+  ...
+}: {
+  environment = {
+    defaultPackages = lib.mkForce [];
+    systemPackages = [pkgs.doas-sudo-shim];
+  };
 
   security = {
-    doas = {
-      enable = true;
-      # Force override the default "wheel" group configuration.
-      extraRules = mkForce [
-        {
-          groups = ["wheel"];
-          keepEnv = true;
-          # Fix missing git binary error when rebuilding the system configuration
-          setEnv = ["PATH"];
-        }
-      ];
-    };
-
+    doas.enable = true;
     sudo.enable = false;
   };
 }
