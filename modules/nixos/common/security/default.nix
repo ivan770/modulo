@@ -9,7 +9,20 @@
   };
 
   security = {
-    doas.enable = true;
+    doas = {
+      enable = true;
+
+      # Using nixos-rebuild with --use-remote-sudo requires entering password
+      # multiple times, which is annoying. To prevent that, doas is instructed to
+      # remember password authentications for some short time.
+      extraRules = lib.mkForce [
+        {
+          groups = ["wheel"];
+          persist = true;
+        }
+      ];
+    };
+
     sudo.enable = false;
   };
 }
