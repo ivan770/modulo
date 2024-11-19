@@ -17,12 +17,6 @@ _: {
   # journald has built-in log rotation capabilities
   services.logrotate.enable = false;
 
-  # Replace Perl-based configuration switcher with a native one
-  system.switch = {
-    enable = false;
-    enableNg = true;
-  };
-
   # Disable software that is already included with the Home Manager
   xdg = {
     autostart.enable = false;

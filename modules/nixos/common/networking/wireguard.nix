@@ -147,10 +147,8 @@ in {
               attachedNodes =
                 map
                 (node: {
-                  wireguardPeerConfig = {
-                    PublicKey = node.publicKey;
-                    AllowedIPs = ["${node.address}/128"];
-                  };
+                  PublicKey = node.publicKey;
+                  AllowedIPs = ["${node.address}/128"];
                 })
                 (attrValues nodes);
 
@@ -160,23 +158,19 @@ in {
                   relay,
                   nodes,
                 }: {
-                  wireguardPeerConfig = {
-                    PublicKey = nodes.${relay.node}.publicKey;
-                    Endpoint = relay.endpoint;
-                    AllowedIPs = ["${relay.subnet}/64"];
-                    PersistentKeepalive = 25;
-                  };
+                  PublicKey = nodes.${relay.node}.publicKey;
+                  Endpoint = relay.endpoint;
+                  AllowedIPs = ["${relay.subnet}/64"];
+                  PersistentKeepalive = 25;
                 }))
               ];
 
               subnetRelay = [
                 {
-                  wireguardPeerConfig = {
-                    PublicKey = nodes.${relay.node}.publicKey;
-                    Endpoint = relay.endpoint;
-                    AllowedIPs = ["${cfg.ulaCidr}/48"];
-                    PersistentKeepalive = 25;
-                  };
+                  PublicKey = nodes.${relay.node}.publicKey;
+                  Endpoint = relay.endpoint;
+                  AllowedIPs = ["${cfg.ulaCidr}/48"];
+                  PersistentKeepalive = 25;
                 }
               ];
             in

@@ -76,7 +76,7 @@ in {
       inherit (pkgs) dejavu_fonts noto-fonts-color-emoji;
     };
 
-    hardware.opengl.enable = true;
+    hardware.graphics.enable = true;
 
     boot = {
       consoleLogLevel = 0;

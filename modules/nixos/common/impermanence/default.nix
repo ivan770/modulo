@@ -4,9 +4,7 @@
   lib,
   ...
 }: let
-  inherit (lib) mkEnableOption mkIf mkOption types;
-
-  cfg = config.modulo.impermanence;
+  inherit (lib) mkOption types;
 in {
   options.modulo.impermanence = {
     persistentDirectory = mkOption {
@@ -15,8 +13,6 @@ in {
         Directory that will be used to store persistent files.
       '';
     };
-
-    experimental = mkEnableOption "experimental impermanence options";
   };
 
   imports = [
@@ -38,7 +34,7 @@ in {
     # so the build directory has to be moved to a persistent storage.
     nix.settings.build-dir = "/var/tmp";
 
-    system.etc.overlay = mkIf cfg.experimental {
+    system.etc.overlay = {
       enable = true;
       mutable = true;
     };
