@@ -36,6 +36,8 @@ in {
       gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
     };
 
+    dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+
     fonts.fontconfig.enable = true;
 
     xdg = {
