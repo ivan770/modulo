@@ -4,11 +4,19 @@ _: {
       # Disable "Magic SysRq key"
       "kernel.sysrq" = 0;
 
+      # Ensure that legacy TIOCSTI is unavailable
+      # This prevents some bubblewrap-related attacks with untrusted code.
+      "dev.tty.legacy_tiocsti" = false;
+
       # Common recommendations
+      "fs.protected_fifos" = 2;
+      "fs.protected_regular" = 2;
       "fs.suid_dumpable" = 0;
+      "dev.tty.ldisc_autoload" = false;
       "kernel.kptr_restrict" = 2;
       "kernel.ftrace_enabled" = false;
       "kernel.dmesg_restrict" = true;
+      "kernel.perf_event_paranoid" = 3;
       "kernel.unprivileged_bpf_disabled" = 1;
       "kernel.yama.ptrace_scope" = 2;
     };
