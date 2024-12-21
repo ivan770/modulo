@@ -4,7 +4,18 @@
   inputs,
   ...
 }: let
-  inherit (lib) flatten genAttrs listToAttrs mapAttrs mapAttrs' mapAttrsToList nameValuePair mkOption types;
+  inherit
+    (lib)
+    flatten
+    genAttrs
+    listToAttrs
+    mapAttrs
+    mapAttrs'
+    mapAttrsToList
+    nameValuePair
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.secrets;
 in {
@@ -92,6 +103,8 @@ in {
 
     sops = {
       defaultSopsFile = cfg.sopsFile;
+
+      validateSopsFiles = config.modulo.filesystem.type == "standard";
 
       secrets =
         mapAttrs'

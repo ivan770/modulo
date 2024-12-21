@@ -3,7 +3,7 @@
   config,
   ...
 }: let
-  inherit (lib) mkOption types;
+  inherit (lib) mkDefault mkIf mkOption types;
 
   cfg = config.modulo.boot;
 in {
@@ -32,9 +32,9 @@ in {
         efiSysMountPoint = cfg.systemd-boot.mountpoint;
       };
 
-      grub.enable = false;
+      grub.enable = mkDefault false;
 
-      systemd-boot = {
+      systemd-boot = mkIf (config.modulo.filesystem.type == "standard") {
         enable = true;
         editor = false;
         consoleMode = "max";
