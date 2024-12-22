@@ -20,6 +20,17 @@ _: {
     "systemd.journald.forward_to_console=1"
   ];
 
+  systemd.services.test-reboot = {
+    description = "Initialize test reboot process.";
+
+    wantedBy = ["multi-user.target"];
+    after = ["multi-user.target"];
+
+    script = ''
+      systemctl reboot --no-block
+    '';
+  };
+
   users.users.root.password = "cleartestpassword";
 
   system.stateVersion = "24.11";

@@ -20,14 +20,12 @@ in {
       "/efi" = {
         fsType = "vfat";
         device = "/dev/disk/by-partlabel/esp";
-        options = ["x-systemd.after=systemd-repart.service"];
-        neededForBoot = true;
+        neededForBoot = false;
       };
 
       "/usr" = {
         fsType = "erofs";
         device = "/dev/disk/by-partlabel/${cfg.name}_${version}";
-        options = ["x-systemd.after=systemd-repart.service"];
         neededForBoot = true;
       };
 
@@ -41,15 +39,22 @@ in {
       "/data" = {
         fsType = cfg.partitions.data.type;
         label = "data";
-        options = ["x-systemd.after=systemd-repart.service"];
         neededForBoot = true;
       };
     };
 
-    boot.initrd.systemd.repart = {
-      inherit (cfg) device;
+    boot.initrd.systemd = {
+      repart = {
+        inherit (cfg) device;
 
-      enable = true;
+        enable = true;
+      };
+
+      services.systemd-repart.before = [
+        "local-fs-pre.target"
+        "sysusr-usr.mount"
+        "create-needed-for-boot-dirs.service"
+      ];
     };
 
     systemd.repart.partitions = {
