@@ -15,6 +15,7 @@
     mapAttrs
     mkIf
     mkOption
+    optionalAttrs
     optionalString
     splitString
     sublist
@@ -35,6 +36,19 @@ in {
     activatedUpstreams = mkOption {
       type = types.attrsOf (types.submodule {
         options = {
+          listen = mkOption {
+            type = types.enum [
+              "global"
+              "wireguard"
+            ];
+            default = "global";
+            description = ''
+              Address types to listen on:
+                * `global` - listen on all interfaces.
+                * `wireguard` - listen only on the WireGuard interface.
+            '';
+          };
+
           upstream = mkOption {
             type = types.nullOr types.str;
             default = null;
@@ -55,8 +69,9 @@ in {
             type = types.nullOr types.str;
             default = null;
             description = ''
-              SSL certificate source. When `null`, hostname
-              will be automatically determined based on the second-level domain.
+              SSL certificate source.
+              When `null` and `listen` is `global` hostname will be determined
+              using the second-level domain. TLS is always disabled when using WireGuard `listen`.
             '';
           };
 
@@ -173,17 +188,26 @@ in {
           || (upstream != null && redirect != null));
 
         message = ''
-          All activated upstreams must have either an upstream reference or
+          All activated upstreams must have either upstream reference or
           redirect URL set.
         '';
       }
       {
         assertion =
           mkActivatedUpstreamAssertion (_: {cors, ...}:
-            cors.origin == "*" && cors.allowCredentials);
+            (cors.origin == "*") && cors.allowCredentials);
 
         message = ''
           Wildcard origin and allowCredentials cannot be used together per https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Allow-Credentials.
+        '';
+      }
+      {
+        assertion =
+          mkActivatedUpstreamAssertion (_: {listen, ...}:
+            listen == "wireguard" && config.modulo.networking.wireguard.addresses == []);
+
+        message = ''
+          WireGuard upstreams require an active WireGuard configuration.
         '';
       }
     ];
@@ -233,21 +257,16 @@ in {
 
       virtualHosts =
         (mapAttrs (name: {
-            upstream,
-            redirect,
-            ssl,
-            cors,
-          }: {
-            useACMEHost = let
-              components = splitString "." name;
-              total = length components;
-            in
-              if isString ssl
-              then ssl
-              else concatStringsSep "." (sublist (total - 2) total components);
-
-            forceSSL = true;
-            kTLS = true;
+          listen,
+          upstream,
+          redirect,
+          ssl,
+          cors,
+        }:
+          {
+            listenAddresses =
+              mkIf (listen == "wireguard")
+              (map (a: "[${a}]") config.modulo.networking.wireguard.addresses);
 
             locations = let
               extraConfig = let
@@ -304,8 +323,20 @@ in {
                 then proxyLocation
                 else redirectLocation;
             };
-          })
-          cfg.activatedUpstreams)
+          }
+          // (optionalAttrs (listen == "global") {
+            useACMEHost = let
+              components = splitString "." name;
+              total = length components;
+            in
+              if isString ssl
+              then ssl
+              else concatStringsSep "." (sublist (total - 2) total components);
+
+            forceSSL = true;
+            kTLS = true;
+          }))
+        cfg.activatedUpstreams)
         // {
           "_" = {
             default = true;

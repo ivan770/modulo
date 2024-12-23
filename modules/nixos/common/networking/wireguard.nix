@@ -96,6 +96,14 @@ in {
       '';
     };
 
+    addresses = mkOption {
+      type = types.listOf types.str;
+      default = [];
+      description = ''
+        Assigned WireGuard addresses.
+      '';
+    };
+
     actsAsRelay = mkOption {
       internal = true;
       type = types.bool;
@@ -108,6 +116,7 @@ in {
 
   config = let
     hostname = config.networking.hostName;
+
     memberZones =
       filterAttrs
       (_: {nodes, ...}: hasAttr hostname nodes)
@@ -201,17 +210,21 @@ in {
         networking = {
           interfaces.wg0 = {
             dhcp = null;
-            address =
-              mapAttrsToList
-              (_: {nodes, ...}: "${nodes.${hostname}.address}/48")
-              memberZones;
+            address = map (address: "${address}/48") cfg.addresses;
             onlineStatus = null;
           };
 
-          wireguard.actsAsRelay =
-            any
-            ({relay, ...}: relay.node == hostname)
-            (attrValues memberZones);
+          wireguard = {
+            actsAsRelay =
+              any
+              ({relay, ...}: relay.node == hostname)
+              (attrValues memberZones);
+
+            addresses =
+              mapAttrsToList
+              (_: {nodes, ...}: nodes.${hostname}.address)
+              memberZones;
+          };
         };
 
         secrets.applications."wireguard/${hostname}" = {
