@@ -40,8 +40,7 @@ in {
     };
 
     home.file.".XCompose".text = let
-      rules = [''include "%L"''] ++ cfg.xcompose;
-      concat = concatStringsSep "\n" rules;
+      concat = concatStringsSep "\n" cfg.xcompose;
     in
       mkIf (cfg.xcompose != null) concat;
   };
