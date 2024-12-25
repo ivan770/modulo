@@ -22,6 +22,14 @@ in {
         X keyboard options.
       '';
     };
+
+    xcompose = mkOption {
+      type = with types; nullOr (listOf str);
+      default = null;
+      description = ''
+        XCompose configuration.
+      '';
+    };
   };
 
   config = mkIf config.modulo.desktop.enable {
@@ -30,5 +38,11 @@ in {
 
       layout = concatStringsSep "," cfg.layout;
     };
+
+    home.file.".XCompose".text = let
+      rules = [''include "%L"''] ++ cfg.xcompose;
+      concat = concatStringsSep "\n" rules;
+    in
+      mkIf (cfg.xcompose != null) concat;
   };
 }
