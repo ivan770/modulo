@@ -70,10 +70,12 @@ in {
       }
     ];
 
-    # Required for default system-wide fonts configuration.
-    # See fonts.fontconfig.defaultFonts.* for more information.
-    fonts.packages = builtins.attrValues {
-      inherit (pkgs) dejavu_fonts noto-fonts-color-emoji;
+    # Fonts are meant to be set up using Home Manager.
+    fonts.fontconfig.defaultFonts = {
+      monospace = [];
+      serif = [];
+      sansSerif = [];
+      emoji = [];
     };
 
     hardware.graphics.enable = true;
