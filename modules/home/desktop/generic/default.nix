@@ -34,6 +34,16 @@ in {
     gtk = {
       enable = true;
       gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
+
+      # Round corners are removed to make GTK 4 windows look better on tiling WMs.
+      gtk4.extraCss = ''
+        window {
+          border-top-left-radius: 0;
+          border-top-right-radius: 0;
+          border-bottom-left-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      '';
     };
 
     dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
