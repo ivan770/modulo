@@ -30,7 +30,7 @@ in {
           ./gpu.nix
           ./gtk.nix
           ./locale.nix
-          ./portal.nix
+          ./permissions.nix
         ];
 
         etc.sslCertificates.enable = lib.mkDefault true;
