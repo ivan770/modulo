@@ -50,11 +50,33 @@ in {
         enable = true;
       };
 
-      services.systemd-repart.before = [
-        "local-fs-pre.target"
-        "sysusr-usr.mount"
-        "create-needed-for-boot-dirs.service"
-      ];
+      services.udev-barrier = {
+        description = "Trigger systemd-udevd and wait for device discovery";
+
+        requires = ["systemd-repart.service"];
+        after = ["systemd-repart.service"];
+
+        wantedBy = ["initrd.target"];
+        before = [
+          "sysroot.mount"
+          "sysusr-usr.mount"
+          "create-needed-for-boot-dirs.service"
+        ];
+
+        script = ''
+          udevadm trigger --settle
+        '';
+
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = "yes";
+        };
+      };
+
+      units."systemd-fsck@.service".text = ''
+        [Unit]
+        After=udev-barrier.service
+      '';
     };
 
     systemd.repart.partitions = {
@@ -93,5 +115,16 @@ in {
     };
 
     modulo.impermanence.persistentDirectory = lib.mkDefault "/data";
+
+    # /usr/bin/env is initialized during the activation phase,
+    # breaking the activation script since the /usr filesystem is immutable.
+    system.activationScripts = {
+      usrbinenv = lib.mkForce "";
+      binsh = lib.mkForce "";
+    };
+
+    # FIXME: console setup fails on image-based systems for some reason.
+    # May be related: https://github.com/NixOS/nixpkgs/issues/312452
+    boot.kernelParams = ["systemd.mask=systemd-vconsole-setup.service"];
   };
 }
