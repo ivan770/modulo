@@ -12,7 +12,7 @@ in {
     enable =
       mkEnableOption "GTK configuration propagation"
       // {
-        enable = true;
+        default = true;
       };
 
     cursor = {
@@ -47,8 +47,8 @@ in {
       ];
 
       env = {
-        XCURSOR_THEME = cfg.cursor.name;
-        XCURSOR_SIZE = cfg.cursor.size;
+        XCURSOR_THEME = builtins.toString cfg.cursor.name;
+        XCURSOR_SIZE = builtins.toString cfg.cursor.size;
         XCURSOR_PATH = "${cfg.cursor.package}/share/icons";
       };
 
