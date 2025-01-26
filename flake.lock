@@ -16,6 +16,29 @@
         "type": "github"
       }
     },
+    "bwrap-bpf-filter": {
+      "inputs": {
+        "flake-utils": [
+          "flake-utils-plus"
+        ],
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1737929880,
+        "narHash": "sha256-ig7YwqnCyEFDKT1ZYfEycqEQ1OZsrzUn3DpDblKgI6E=",
+        "owner": "ivan770",
+        "repo": "bwrap-bpf-filter",
+        "rev": "a24782bc6f7038ddb93e9e257888db4c1a7450ed",
+        "type": "github"
+      },
+      "original": {
+        "owner": "ivan770",
+        "repo": "bwrap-bpf-filter",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -23,16 +46,16 @@
         ]
       },
       "locked": {
-        "lastModified": 1730135292,
-        "narHash": "sha256-CI27qHAbc3/tIe8sb37kiHNaeCqGxNimckCMj0lW5kg=",
+        "lastModified": 1736864502,
+        "narHash": "sha256-ItkIZyebGvNH2dK9jVGzJHGPtb6BSWLN8Gmef16NeY0=",
         "owner": "nix-community",
         "repo": "disko",
-        "rev": "ab58501b2341bc5e0fc88f2f5983a679b075ddf5",
+        "rev": "0141aabed359f063de7413f80d906e1d98c0c123",
         "type": "github"
       },
       "original": {
         "owner": "nix-community",
-        "ref": "v1.9.0",
+        "ref": "v1.11.0",
         "repo": "disko",
         "type": "github"
       }
@@ -200,15 +223,15 @@
         ]
       },
       "locked": {
-        "lastModified": 1737599681,
-        "narHash": "sha256-sFzfMxH7c9UWyrFsC2wsPRJqTCHchz7q2zd04+9/yvw=",
-        "owner": "nixpak",
+        "lastModified": 1737930077,
+        "narHash": "sha256-Q5dLGZZJHaFJFUaaH6z/5grxO+Mjc+aKQ/eU/R4DJb0=",
+        "owner": "ivan770",
         "repo": "nixpak",
-        "rev": "68beced51b937d506187431bec4847e78fd34911",
+        "rev": "4d45c2cf30c1d97d69909785bd79712bea7fb25c",
         "type": "github"
       },
       "original": {
-        "owner": "nixpak",
+        "owner": "ivan770",
         "repo": "nixpak",
         "type": "github"
       }
@@ -231,6 +254,7 @@
     },
     "root": {
       "inputs": {
+        "bwrap-bpf-filter": "bwrap-bpf-filter",
         "disko": "disko",
         "flake-compat": "flake-compat",
         "flake-utils-plus": "flake-utils-plus",
@@ -308,11 +332,11 @@
     },
     "unstable": {
       "locked": {
-        "lastModified": 1737746512,
-        "narHash": "sha256-nU6AezEX4EuahTO1YopzueAXfjFfmCHylYEFCagduHU=",
+        "lastModified": 1737885589,
+        "narHash": "sha256-Zf0hSrtzaM1DEz8//+Xs51k/wdSajticVrATqDrfQjg=",
         "owner": "NixOS",
         "repo": "nixpkgs",
-        "rev": "825479c345a7f806485b7f00dbe3abb50641b083",
+        "rev": "852ff1d9e153d8875a83602e03fdef8a63f0ecf8",
         "type": "github"
       },
       "original": {

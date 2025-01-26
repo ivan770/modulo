@@ -9,7 +9,7 @@
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
 
     disko = {
-      url = "github:nix-community/disko/v1.9.0";
+      url = "github:nix-community/disko/v1.11.0";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
@@ -20,8 +20,16 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
-    nixpak.url = "github:nixpak/nixpak";
+    nixpak.url = "github:ivan770/nixpak";
     nixpak.inputs.nixpkgs.follows = "nixpkgs";
+
+    bwrap-bpf-filter = {
+      url = "github:ivan770/bwrap-bpf-filter";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils-plus";
+      };
+    };
 
     nix-colors.url = "github:Misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";

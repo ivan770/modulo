@@ -31,6 +31,7 @@ in {
           ./gtk.nix
           ./locale.nix
           ./permissions.nix
+          ./syscallFilter.nix
         ];
 
         etc.sslCertificates.enable = lib.mkDefault true;
