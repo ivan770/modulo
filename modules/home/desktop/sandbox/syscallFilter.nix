@@ -4,7 +4,7 @@
   pkgs,
   ...
 }: let
-  inherit (lib) concatStringsSep mkEnableOption mkIf optional types;
+  inherit (lib) concatStringsSep mkEnableOption mkIf optional;
 
   cfg = config.modulo.syscallFilter;
 
@@ -12,7 +12,7 @@
     "x86_64-linux" = "x86-64";
   };
 
-  flags = optional (cfg.nestedSandboxing) "--nested-sandboxing";
+  flags = optional cfg.nestedSandboxing "--nested-sandboxing";
 
   seccomp = pkgs.stdenvNoCC.mkDerivation {
     pname = "modulo-sandbox-bpf";
