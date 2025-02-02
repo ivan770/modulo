@@ -12,14 +12,18 @@ in
   mkIf (config.modulo.networking.enable && wirelessEnabled) {
     networking.wireless.iwd = {
       enable = true;
+
       settings = {
         General = {
           AddressRandomization = "network";
+          AddressRandomizationRange = "full";
+          EnableNetworkConfiguration = false;
 
           # Prevent frequent roaming on unstable networks
           RoamThreshold = -75;
           RoamThreshold5G = -80;
         };
+
         Scan.DisablePeriodicScan = true;
       };
     };
