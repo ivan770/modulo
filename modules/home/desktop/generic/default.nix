@@ -11,6 +11,13 @@ in {
   options.modulo.desktop = {
     enable = mkEnableOption "desktop support";
 
+    theme = mkOption {
+      type = types.enum ["dark" "light"];
+      description = ''
+        Preferred desktop color theme.
+      '';
+    };
+
     associations = mkOption {
       type = types.attrsOf types.str;
       default = {};
@@ -33,7 +40,6 @@ in {
   config = mkIf cfg.enable {
     gtk = {
       enable = true;
-      gtk3.extraConfig.gtk-application-prefer-dark-theme = true;
 
       # Round corners are removed to make GTK 4 windows look better on tiling WMs.
       gtk4.extraCss = ''
@@ -46,7 +52,10 @@ in {
       '';
     };
 
-    dconf.settings."org/gnome/desktop/interface".color-scheme = "prefer-dark";
+    dconf.settings."org/gnome/desktop/interface".color-scheme =
+      if cfg.theme == "dark"
+      then "prefer-dark"
+      else "prefer-light";
 
     fonts.fontconfig.enable = true;
 
