@@ -55,7 +55,13 @@ in {
         {
           input."type:keyboard" = {
             xkb_layout = concatStringsSep "," config.modulo.desktop.layout.layout;
-            xkb_options = concatStringsSep "," config.modulo.desktop.layout.options;
+            xkb_options = let
+              opts =
+                config.modulo.desktop.layout.options
+                # Desktops have VTs disabled by default, so Ctrl+Alt+F* keys are useless anyway.
+                ++ ["srvrkeys:none"];
+            in
+              concatStringsSep "," opts;
           };
 
           output."*".bg = "${config.modulo.desktop.wallpaper.file} fill";
