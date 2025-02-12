@@ -78,6 +78,7 @@ in {
       emoji = [];
     };
 
+    boot.enableContainers = false;
     console.enable = false;
     hardware.graphics.enable = true;
 
