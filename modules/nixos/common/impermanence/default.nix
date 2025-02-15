@@ -23,11 +23,6 @@ in {
   ];
 
   config = {
-    # Coredumps are unused in this configuration.
-    systemd.coredump.extraConfig = ''
-      Storage=none
-    '';
-
     users.mutableUsers = false;
 
     # Nix can quickly drain the entire root tmpfs during the build process,

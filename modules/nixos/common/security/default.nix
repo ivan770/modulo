@@ -8,6 +8,11 @@
     systemPackages = [pkgs.doas-sudo-shim];
   };
 
+  systemd.coredump.extraConfig = ''
+    Storage=none
+    ProcessSizeMax=0
+  '';
+
   security = {
     doas = {
       enable = true;

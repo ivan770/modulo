@@ -24,9 +24,11 @@ _: {
     kernelParams = [
       # https://bugzilla.redhat.com/show_bug.cgi?id=2055118
       "page_alloc.shuffle=1"
+      "randomize_kstack_offset=1"
 
-      # Legacy feature
+      # Legacy features
       "vsyscall=none"
+      "ia32_emulation=0"
 
       # Debugfs is unused in this configuration
       "debugfs=off"

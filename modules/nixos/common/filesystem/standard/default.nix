@@ -301,7 +301,12 @@ in {
         udev.extraRules = let
           rules =
             mapAttrsToList
-            (name: {ioScheduler, ...}: ''ACTION=="add|change", KERNEL=="${removePrefix "/dev/" name}", ATTR{queue/scheduler}="${ioScheduler}"'')
+            (name: {ioScheduler, ...}:
+              concatStringsSep ", " [
+                ''ACTION=="add|change"''
+                ''KERNEL=="${removePrefix "/dev/" name}"''
+                ''ATTR{queue/scheduler}="${ioScheduler}"''
+              ])
             cfg.disks;
         in
           concatStringsSep "\n" rules;
