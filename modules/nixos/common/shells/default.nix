@@ -3,7 +3,17 @@
   lib,
   ...
 }: let
-  inherit (lib) elem filterAttrs genAttrs mapAttrsToList mkIf pipe strings;
+  inherit
+    (lib)
+    elem
+    filterAttrs
+    genAttrs
+    mapAttrsToList
+    mkIf
+    pipe
+    strings
+    unique
+    ;
 
   supportedShells = [
     "fish"
@@ -12,12 +22,17 @@
 
   activatedShells = pipe config.users.users [
     (filterAttrs (_: user: user.isNormalUser))
-    (mapAttrsToList (_: user: strings.getName user.shell))
+    (mapAttrsToList (_: user: user.shell))
+    unique
   ];
 
+  activatedShellNames = map strings.getName activatedShells;
+
   programs = genAttrs supportedShells (shell: {
-    enable = mkIf (elem shell activatedShells) true;
+    enable = mkIf (elem shell activatedShellNames) true;
   });
 in {
   inherit programs;
+
+  environment.shells = activatedShells;
 }
