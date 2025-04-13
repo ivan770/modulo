@@ -114,7 +114,11 @@ in {
     xdg.portal = {
       enable = true;
       xdgOpenUsePortal = true;
-      config.common.default = ["gtk" "wlr"];
+      config.common = {
+        default = ["gtk"];
+        "org.freedesktop.impl.portal.Screenshot" = ["wlr"];
+        "org.freedesktop.impl.portal.ScreenCast" = ["wlr"];
+      };
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
         pkgs.xdg-desktop-portal-wlr

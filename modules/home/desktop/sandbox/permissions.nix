@@ -25,16 +25,15 @@ in {
 
   config = {
     bubblewrap.bind.rw = mkIf cfg.document [
-      [
-        (sloth.concat' sloth.runtimeDir "/doc/by-app/${config.flatpak.appId}")
-        (sloth.concat' sloth.runtimeDir "/doc")
-      ]
+      (sloth.concat' sloth.runtimeDir "/doc")
     ];
 
     dbus = {
       policies = mkMerge [
         {
+          "org.freedesktop.DBus" = "talk";
           "org.freedesktop.portal.Desktop" = "talk";
+          "org.freedesktop.portal.Flatpak" = "talk";
         }
 
         (mkIf cfg.dconf {
@@ -46,6 +45,7 @@ in {
         })
 
         (mkIf cfg.notifications {
+          "org.freedesktop.Notifications" = "talk";
           "org.freedesktop.portal.Notification" = "talk";
         })
 
@@ -57,13 +57,8 @@ in {
       ];
 
       rules = {
-        call."org.freedesktop.portal.Desktop" = [
-          "org.freedesktop.portal.Settings.Read@/org/freedesktop/portal/desktop"
-        ];
-
-        broadcast."org.freedesktop.portal.Desktop" = [
-          "org.freedesktop.portal.Settings.SettingChanged@/org/freedesktop/portal/desktop"
-        ];
+        call."org.freedesktop.portal.*" = ["*"];
+        broadcast."org.freedesktop.portal.*" = ["@/org/freedesktop/portal/*"];
       };
     };
   };
