@@ -23,7 +23,11 @@ in {
     gpu.enable = true;
 
     bubblewrap = {
-      bind.rw = [(sloth.concat' sloth.xdgCacheHome "/mesa_shader_cache")];
+      bind.rw = [
+        (sloth.concat' sloth.xdgCacheHome "/mesa_shader_cache")
+        (sloth.concat' sloth.xdgCacheHome "/mesa_shader_cache_db")
+      ];
+
       extraStorePaths = [cfg.driverPackage];
     };
   };
