@@ -2,7 +2,6 @@
   config,
   lib,
   options,
-  pkgs,
   ...
 }: let
   inherit
@@ -111,18 +110,6 @@ in {
       '';
     };
 
-    xdg.portal = {
-      enable = true;
-      xdgOpenUsePortal = true;
-      config.common = {
-        default = ["gtk"];
-        "org.freedesktop.impl.portal.Screenshot" = ["wlr"];
-        "org.freedesktop.impl.portal.ScreenCast" = ["wlr"];
-      };
-      extraPortals = [
-        pkgs.xdg-desktop-portal-gtk
-        pkgs.xdg-desktop-portal-wlr
-      ];
-    };
+    modulo.desktop.portal.flavor = "wlr";
   };
 }

@@ -33,6 +33,7 @@ in {
     ./layout.nix
     ./lock.nix
     ./menu.nix
+    ./portal.nix
     ./terminal.nix
     ./wallpaper.nix
   ];
