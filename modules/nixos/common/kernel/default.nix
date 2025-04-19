@@ -28,7 +28,6 @@ _: {
 
       # Legacy features
       "vsyscall=none"
-      "ia32_emulation=0"
 
       # Debugfs is unused in this configuration
       "debugfs=off"

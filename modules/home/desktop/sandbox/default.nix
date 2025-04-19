@@ -5,7 +5,8 @@
   pkgs,
   ...
 }: let
-  inherit (lib) mkOption types;
+  inherit (lib) mkIf mkOption types;
+  inherit (osConfig.hardware) graphics;
 in {
   options.modulo.desktop.sandbox = {
     builder = mkOption {
@@ -53,7 +54,12 @@ in {
 
         modulo = {
           fonts.fonts = config.modulo.desktop.fonts.packages;
-          gpu.driverPackage = osConfig.hardware.graphics.package;
+
+          gpu = {
+            driverPackage = graphics.package;
+            driverPackage32Bit = mkIf graphics.enable32Bit graphics.package32;
+          };
+
           gtk.cursor = {
             inherit (config.modulo.desktop.cursor) package name size;
           };
