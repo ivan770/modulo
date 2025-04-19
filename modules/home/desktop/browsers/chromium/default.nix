@@ -35,6 +35,9 @@
 
       # Touchpad gestures
       "TouchpadOverscrollHistoryNavigation"
+
+      # PipeWire camera support
+      "WebRtcPipeWireCamera"
     ]
     ++ cfg.enabledFeatures);
 
