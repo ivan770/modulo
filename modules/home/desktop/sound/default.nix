@@ -26,6 +26,8 @@
       "-DBUILD_LV2_PLUGIN=OFF"
     ];
 
+    outputs = ["out"];
+
     buildInputs =
       (old.buildInputs or [])
       ++ [pkgs.juce];
@@ -35,6 +37,10 @@
     NIX_CFLAGS_COMPILE =
       (old.NIX_CFLAGS_COMPILE or [])
       ++ ["-march=znver3" "-mtune=znver4"];
+
+    # Default postInstall includes separate outputs for plugins,
+    # but since we build one plugin in the first place, just rely on $out.
+    postInstall = "";
   });
 in {
   options.modulo.desktop.sound = {
