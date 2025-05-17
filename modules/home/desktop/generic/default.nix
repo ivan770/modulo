@@ -42,15 +42,23 @@ in {
     gtk = {
       enable = true;
 
-      # Round corners are removed to make GTK 4 windows look better on tiling WMs.
-      gtk4.extraCss = ''
-        window {
-          border-top-left-radius: 0;
-          border-top-right-radius: 0;
-          border-bottom-left-radius: 0;
-          border-bottom-right-radius: 0;
-        }
-      '';
+      gtk3.extraConfig.gtk-application-prefer-dark-theme =
+        mkIf (cfg.theme == "dark") true;
+
+      gtk4 = {
+        extraConfig.gtk-application-prefer-dark-theme =
+          mkIf (cfg.theme == "dark") true;
+
+        # Round corners are removed to make GTK 4 windows look better on tiling WMs.
+        extraCss = ''
+          window {
+            border-top-left-radius: 0;
+            border-top-right-radius: 0;
+            border-bottom-left-radius: 0;
+            border-bottom-right-radius: 0;
+          }
+        '';
+      };
     };
 
     dconf.settings."org/gnome/desktop/interface".color-scheme =

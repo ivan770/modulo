@@ -211,6 +211,7 @@ in {
   imports = [
     ./dns.nix
     ./firewall.nix
+    ./usb.nix
     ./wireguard.nix
     ./wireless.nix
   ];

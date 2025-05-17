@@ -133,7 +133,7 @@ in {
               command = ''
                 ${getExe pkgs.greetd.tuigreet} \
                   --time \
-                  --cmd ${cfg.command}
+                  --cmd "${cfg.command}"
               '';
 
               user = "greeter";

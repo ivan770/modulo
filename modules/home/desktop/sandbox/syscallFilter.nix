@@ -4,7 +4,13 @@
   pkgs,
   ...
 }: let
-  inherit (lib) concatStringsSep mkEnableOption mkIf optional;
+  inherit
+    (lib)
+    concatStringsSep
+    mkEnableOption
+    mkIf
+    optional
+    ;
 
   cfg = config.modulo.syscallFilter;
 
@@ -14,19 +20,17 @@
 
   flags = optional cfg.nestedSandboxing "--nested-sandboxing";
 
-  seccomp = pkgs.stdenvNoCC.mkDerivation {
-    pname = "modulo-sandbox-bpf";
-    version = "0.1.0";
-
-    nativeBuildInputs = [pkgs.modulo.bwrap-bpf-filter];
-
-    dontUnpack = true;
-
-    buildPhase = ''
-      bwrap-bpf-filter ${targetArch.${pkgs.stdenvNoCC.hostPlatform.system}} \
+  seccomp = {
+    modulo,
+    runCommand,
+    stdenvNoCC,
+  }:
+    runCommand "modulo-sandbox-bpf" {
+      nativeBuildInputs = [modulo.bwrap-bpf-filter];
+    } ''
+      bwrap-bpf-filter ${targetArch.${stdenvNoCC.hostPlatform.system}} \
         $out ${concatStringsSep " " flags}
     '';
-  };
 in {
   options.modulo.syscallFilter = {
     enable =
@@ -39,6 +43,6 @@ in {
   };
 
   config.bubblewrap = mkIf cfg.enable {
-    inherit seccomp;
+    seccomp = pkgs.callPackage seccomp {};
   };
 }
