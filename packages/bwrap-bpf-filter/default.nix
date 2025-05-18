@@ -3,4 +3,4 @@
   stdenvNoCC,
   ...
 }:
-inputs.bwrap-bpf-filter.packages.${stdenvNoCC.hostPlatform.system}.default
+inputs.bwrap-bpf-filter.packages.${stdenvNoCC.buildPlatform.system}.default
