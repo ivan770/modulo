@@ -4,33 +4,9 @@
   pkgs,
   ...
 }: let
-  inherit
-    (lib)
-    concatStringsSep
-    mkEnableOption
-    mkIf
-    optional
-    ;
+  inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.syscallFilter;
-
-  targetArch = {
-    "x86_64-linux" = "x86-64";
-  };
-
-  flags = optional cfg.nestedSandboxing "--nested-sandboxing";
-
-  seccomp = {
-    modulo,
-    runCommand,
-    stdenvNoCC,
-  }:
-    runCommand "modulo-sandbox-bpf" {
-      nativeBuildInputs = [modulo.bwrap-bpf-filter];
-    } ''
-      bwrap-bpf-filter ${targetArch.${stdenvNoCC.hostPlatform.system}} \
-        $out ${concatStringsSep " " flags}
-    '';
 in {
   options.modulo.syscallFilter = {
     enable =
@@ -43,6 +19,8 @@ in {
   };
 
   config.bubblewrap = mkIf cfg.enable {
-    seccomp = pkgs.callPackage seccomp {};
+    seccomp = pkgs.bpfFilter {
+      inherit (cfg) nestedSandboxing;
+    };
   };
 }

@@ -57,23 +57,10 @@ in {
       };
     };
 
-    system.build.updatePackage = let
+    system.build.updatePackage = pkgs.updatePackage {
+      inherit uki version;
+      inherit (cfg) name;
       inherit (config.system.build) image;
-    in
-      pkgs.stdenvNoCC.mkDerivation {
-        inherit version;
-
-        pname = "update-package";
-
-        buildCommand = ''
-          mkdir -p $out
-          cd $out
-
-          ln -s "${uki}" "${cfg.name}_${version}.efi"
-          ln -s "${image}/${cfg.name}_${version}.raw" "${cfg.name}_${version}.raw"
-          ln -s "${image}/${cfg.name}_${version}.store-${efiArch}.raw" "${cfg.name}_${version}.store-${efiArch}.raw"
-          sha256sum * > SHA256SUMS
-        '';
-      };
+    };
   };
 }

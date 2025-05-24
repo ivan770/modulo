@@ -2,7 +2,7 @@
   inputs,
   lib,
   ...
-}: _: pkgs: let
+}: pkgs: prev: let
   src = pkgs.applyPatches {
     name = "patched-nixpak";
     src = inputs.nixpak;
@@ -23,5 +23,9 @@
 in {
   mkNixPak = patchedNixpak.outputs.lib.nixpak {
     inherit lib pkgs;
+  };
+
+  bpfFilter = prev.callPackage ./bpfFilter.nix {
+    inherit (inputs) bwrap-bpf-filter;
   };
 }
