@@ -31,6 +31,14 @@
       };
     };
 
+    slicer = {
+      url = "github:ivan770/slicer";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        flake-utils.follows = "flake-utils-plus";
+      };
+    };
+
     nix-colors.url = "github:Misterio77/nix-colors";
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 

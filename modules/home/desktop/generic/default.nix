@@ -34,6 +34,7 @@ in {
     ./lock.nix
     ./menu.nix
     ./portal.nix
+    ./systemd.nix
     ./terminal.nix
     ./wallpaper.nix
   ];

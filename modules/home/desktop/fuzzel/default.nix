@@ -36,8 +36,9 @@ in {
     };
 
     modulo.desktop.menu = let
-      bin = getExe config.programs.fuzzel.package;
+      inherit (config.modulo.desktop.system) runner;
 
+      bin = getExe config.programs.fuzzel.package;
       terminal = config.modulo.desktop.terminal.exec;
 
       promptFlag =
@@ -47,7 +48,7 @@ in {
     in {
       # INI configuration file doesn't preserve the trailing space
       # in prompt strings correctly, so we pass it as a flag here.
-      application = ''${bin} -T "${terminal}"${promptFlag}'';
+      application = ''${bin} --launch-prefix="${runner} " -T "${terminal}"${promptFlag}'';
       generic = prompt: ''${bin} -d -p "${prompt} "'';
     };
   };
