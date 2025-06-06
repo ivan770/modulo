@@ -38,7 +38,7 @@ in
 
     modulo.desktop.menu =
       let
-        inherit (config.modulo.desktop.system) runner;
+        inherit (config.modulo.desktop.systemd) runner;
 
         bin = getExe config.programs.fuzzel.package;
         terminal = config.modulo.desktop.terminal.exec;
