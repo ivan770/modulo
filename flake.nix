@@ -54,11 +54,12 @@
     };
   };
 
-  outputs = {
-    nixpkgs,
-    snowfall,
-    ...
-  } @ inputs:
+  outputs =
+    {
+      nixpkgs,
+      snowfall,
+      ...
+    }@inputs:
     snowfall.mkFlake {
       inherit inputs;
 
@@ -67,7 +68,7 @@
       channels-config.allowUnfree = true;
 
       outputs-builder = channels: {
-        formatter = channels.nixpkgs.alejandra;
+        formatter = channels.nixpkgs.nixfmt-tree;
       };
 
       snowfall = {

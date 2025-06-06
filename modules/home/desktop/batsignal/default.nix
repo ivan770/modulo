@@ -2,11 +2,18 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkEnableOption mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.desktop.batsignal;
-in {
+in
+{
   options.modulo.desktop.batsignal = {
     enable = mkEnableOption "batsignal battery daemon";
 

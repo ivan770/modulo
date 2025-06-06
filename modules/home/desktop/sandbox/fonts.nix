@@ -3,17 +3,22 @@
   lib,
   sloth,
   ...
-}: let
-  inherit (lib) mkEnableOption mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.fonts;
-in {
+in
+{
   options.modulo.fonts = {
-    enable =
-      mkEnableOption "font propagation"
-      // {
-        default = true;
-      };
+    enable = mkEnableOption "font propagation" // {
+      default = true;
+    };
 
     fonts = mkOption {
       type = types.listOf types.package;
@@ -30,6 +35,6 @@ in {
       enable = true;
     };
 
-    bubblewrap.bind.ro = [(sloth.concat' sloth.xdgConfigHome "/fontconfig")];
+    bubblewrap.bind.ro = [ (sloth.concat' sloth.xdgConfigHome "/fontconfig") ];
   };
 }

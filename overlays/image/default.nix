@@ -1,3 +1,3 @@
 _: _: pkgs: {
-  updatePackage = pkgs.callPackage ./updatePackage.nix {};
+  updatePackage = pkgs.callPackage ./updatePackage.nix { };
 }

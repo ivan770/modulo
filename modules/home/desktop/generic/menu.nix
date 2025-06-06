@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf mkOption types;
 
   cfg = config.modulo.desktop.menu;
-in {
+in
+{
   options.modulo.desktop.menu = {
     generic = mkOption {
       type = types.functionTo types.str;

@@ -1,11 +1,13 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkOption types;
-in {
+in
+{
   options.modulo.home-impermanence = {
     directories = mkOption {
       # Let impermanence module handle the typeck
       type = with types; listOf (either attrs str);
-      default = [];
+      default = [ ];
       description = ''
         Personal user directories to persist.
       '';
@@ -13,7 +15,7 @@ in {
 
     files = mkOption {
       type = with types; listOf (either attrs str);
-      default = [];
+      default = [ ];
       description = ''
         Personal user files to persist.
       '';
@@ -64,7 +66,9 @@ in {
       files = [
         {
           file = ".ssh/known_hosts";
-          parentDirectory = {mode = "0700";};
+          parentDirectory = {
+            mode = "0700";
+          };
         }
         ".ssh/id_rsa"
       ];

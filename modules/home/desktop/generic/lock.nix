@@ -3,9 +3,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) getExe' mkOption types;
-in {
+in
+{
   options.modulo.desktop.lock = {
     command = mkOption {
       type = types.nullOr types.str;

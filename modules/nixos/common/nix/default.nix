@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.nix;
-in {
+in
+{
   options.modulo.nix = {
     autoGc = mkEnableOption "automatic Nix garbage collection";
   };

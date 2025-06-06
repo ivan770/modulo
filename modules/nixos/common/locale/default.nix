@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkOption types;
 
   cfg = config.modulo.locale;
-in {
+in
+{
   options.modulo.locale = {
     base = mkOption {
       type = types.str;

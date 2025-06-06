@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) getExe mkEnableOption mkIf;
 
   cfg = config.modulo.desktop.backlight;
-in {
+in
+{
   options.modulo.desktop.backlight = {
     enable = mkEnableOption "display backlight support";
   };
@@ -18,19 +20,21 @@ in {
     services.acpid = {
       enable = true;
 
-      handlers = let
-        light = getExe pkgs.light;
-      in {
-        brightnessUp = {
-          event = "video/brightnessup";
-          action = "${light} -A 5";
-        };
+      handlers =
+        let
+          light = getExe pkgs.light;
+        in
+        {
+          brightnessUp = {
+            event = "video/brightnessup";
+            action = "${light} -A 5";
+          };
 
-        brightnessDown = {
-          event = "video/brightnessdown";
-          action = "${light} -U 5";
+          brightnessDown = {
+            event = "video/brightnessdown";
+            action = "${light} -U 5";
+          };
         };
-      };
     };
   };
 }

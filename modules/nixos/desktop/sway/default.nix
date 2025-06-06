@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.desktop.sway;
-in {
+in
+{
   options.modulo.desktop.sway = {
     enable = mkEnableOption "Sway desktop support";
   };
@@ -16,6 +18,6 @@ in {
     # are correctly executed when configured from HM.
     modulo.desktop.command = "systemd-cat -t sway sway";
 
-    security.pam.services.swaylock = {};
+    security.pam.services.swaylock = { };
   };
 }

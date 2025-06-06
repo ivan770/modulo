@@ -3,9 +3,9 @@
   lib,
   options,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     concatStringsSep
     mkEnableOption
     mkIf
@@ -15,13 +15,14 @@
     ;
 
   cfg = config.modulo.desktop.sway;
-in {
+in
+{
   options.modulo.desktop.sway = {
     enable = mkEnableOption "Sway WM support";
 
     config = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Sway user-specific settings.
       '';
@@ -49,32 +50,30 @@ in {
     wayland.windowManager.sway = {
       enable = true;
 
-      config =
-        recursiveUpdate
-        {
-          input."type:keyboard" = {
-            xkb_layout = concatStringsSep "," config.modulo.desktop.layout.layout;
-            xkb_options = let
+      config = recursiveUpdate {
+        input."type:keyboard" = {
+          xkb_layout = concatStringsSep "," config.modulo.desktop.layout.layout;
+          xkb_options =
+            let
               opts =
                 config.modulo.desktop.layout.options
                 # Desktops have VTs disabled by default, so Ctrl+Alt+F* keys are useless anyway.
-                ++ ["srvrkeys:none"];
+                ++ [ "srvrkeys:none" ];
             in
-              concatStringsSep "," opts;
-          };
+            concatStringsSep "," opts;
+        };
 
-          output."*".bg = "${config.modulo.desktop.wallpaper.file} fill";
+        output."*".bg = "${config.modulo.desktop.wallpaper.file} fill";
 
-          seat."*".xcursor_theme = concatStringsSep " " [
-            config.modulo.desktop.cursor.name
-            (toString config.modulo.desktop.cursor.size)
-          ];
+        seat."*".xcursor_theme = concatStringsSep " " [
+          config.modulo.desktop.cursor.name
+          (toString config.modulo.desktop.cursor.size)
+        ];
 
-          bars = [];
+        bars = [ ];
 
-          bindkeysToCode = true;
-        }
-        cfg.config;
+        bindkeysToCode = true;
+      } cfg.config;
 
       extraConfigEarly = ''
         set $term ${config.modulo.desktop.terminal.generic}
@@ -92,9 +91,7 @@ in {
       # xdg-desktop-portal-gtk has broken app associations by default
       # when the xdgOpenUsePortal option is activated.
       # See https://github.com/NixOS/nixpkgs/issues/189851 for more info.
-      systemd.variables =
-        options.wayland.windowManager.sway.systemd.variables.default
-        ++ ["PATH"];
+      systemd.variables = options.wayland.windowManager.sway.systemd.variables.default ++ [ "PATH" ];
 
       # FIXME: Remove hm-session-vars.sh loading as soon
       # as a more correct way to load environment variables into Sway is

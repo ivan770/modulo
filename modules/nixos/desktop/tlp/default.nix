@@ -2,8 +2,14 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) mkIf mkMerge mkOption types;
+}:
+let
+  inherit (lib)
+    mkIf
+    mkMerge
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.desktop.tlp;
 
@@ -23,10 +29,12 @@
       stop = 50;
     };
   };
-in {
+in
+{
   options.modulo.desktop.tlp = {
     cpu = mkOption {
-      type = with types;
+      type =
+        with types;
         nullOr (submodule {
           options = {
             ac = mkOption {
@@ -52,7 +60,8 @@ in {
 
     battery = {
       chargeMode = mkOption {
-        type = with types;
+        type =
+          with types;
           nullOr (enum [
             "preferBattery"
             "preferBalanced"

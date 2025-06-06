@@ -4,15 +4,17 @@
   modulesPath,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (pkgs.hostPlatform) efiArch;
 
   cfg = config.modulo.filesystem.image;
 
   version = builtins.toString cfg.version;
   uki = "${config.system.build.uki}/${config.system.boot.loader.ukiFile}";
-in {
-  imports = ["${modulesPath}/image/repart.nix"];
+in
+{
+  imports = [ "${modulesPath}/image/repart.nix" ];
 
   config = lib.mkIf (config.modulo.filesystem.type == "image") {
     # FIXME: Add compression
@@ -26,7 +28,8 @@ in {
         "10-esp" = {
           contents = {
             # systemd-boot is not meant to be updated OTA
-            "/EFI/BOOT/BOOT${lib.toUpper efiArch}.EFI".source = "${pkgs.systemd}/lib/systemd/boot/efi/systemd-boot${efiArch}.efi";
+            "/EFI/BOOT/BOOT${lib.toUpper efiArch}.EFI".source =
+              "${pkgs.systemd}/lib/systemd/boot/efi/systemd-boot${efiArch}.efi";
             "/EFI/Linux/${cfg.name}_${version}.efi".source = uki;
           };
 
@@ -43,7 +46,7 @@ in {
         };
 
         "20-store" = {
-          storePaths = [config.system.build.toplevel];
+          storePaths = [ config.system.build.toplevel ];
           stripNixStorePrefix = true;
           repartConfig = {
             Type = "linux-generic";

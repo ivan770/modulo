@@ -3,62 +3,64 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkOption types;
 
   cfg = config.modulo.headless.postgresql;
-in {
+in
+{
   options.modulo.headless.postgresql = {
     apps = mkOption {
       type = with types; listOf str;
-      default = [];
+      default = [ ];
       description = ''
         Available database applications.
       '';
     };
   };
 
-  config.modulo.headless.containers.configurations.postgresql = let
-    package = pkgs.postgresql_16;
-    dataDir = "/var/lib/postgresql";
-  in {
-    config = {
-      exposedServices,
-      settings ? {},
-      ...
-    }: {
-      services.postgresql = {
-        inherit package;
+  config.modulo.headless.containers.configurations.postgresql =
+    let
+      package = pkgs.postgresql_16;
+      dataDir = "/var/lib/postgresql";
+    in
+    {
+      config =
+        {
+          exposedServices,
+          settings ? { },
+          ...
+        }:
+        {
+          services.postgresql = {
+            inherit package;
 
-        enable = true;
-        dataDir = "${dataDir}/${package.psqlSchema}";
+            enable = true;
+            dataDir = "${dataDir}/${package.psqlSchema}";
 
-        settings =
-          {
-            port = exposedServices.main;
-          }
-          // settings;
+            settings = {
+              port = exposedServices.main;
+            } // settings;
 
-        enableTCPIP = true;
+            enableTCPIP = true;
 
-        ensureUsers =
-          map (name: {
-            inherit name;
+            ensureUsers = map (name: {
+              inherit name;
 
-            ensureDBOwnership = true;
-          })
-          cfg.apps;
+              ensureDBOwnership = true;
+            }) cfg.apps;
 
-        ensureDatabases = cfg.apps;
+            ensureDatabases = cfg.apps;
 
-        # Trust only cross-container communication
-        authentication = ''
-          host all all 192.168.100.0/24 trust
-        '';
-      };
+            # Trust only cross-container communication
+            authentication = ''
+              host all all 192.168.100.0/24 trust
+            '';
+          };
+        };
+
+      bindSlots.data = dataDir;
+      exposedServices = [ "main" ];
     };
-
-    bindSlots.data = dataDir;
-    exposedServices = ["main"];
-  };
 }

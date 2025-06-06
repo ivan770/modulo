@@ -2,14 +2,21 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf mkOption types;
 
   cfg = config.modulo.firmware;
-in {
+in
+{
   options.modulo.firmware = {
     cpu.vendor = mkOption {
-      type = types.nullOr (types.enum ["amd" "intel"]);
+      type = types.nullOr (
+        types.enum [
+          "amd"
+          "intel"
+        ]
+      );
       description = "CPU vendor";
       example = "amd";
     };

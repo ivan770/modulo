@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.desktop.yubikey;
-in {
+in
+{
   options.modulo.desktop.yubikey = {
     enable = mkEnableOption "YubiKey support";
   };

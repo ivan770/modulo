@@ -2,11 +2,18 @@
   config,
   lib,
   ...
-}: let
-  inherit (lib) concatStringsSep mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    concatStringsSep
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.desktop.layout;
-in {
+in
+{
   options.modulo.desktop.layout = {
     layout = mkOption {
       type = types.listOf types.str;
@@ -17,7 +24,7 @@ in {
 
     options = mkOption {
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
       description = ''
         X keyboard options.
       '';
@@ -39,9 +46,10 @@ in {
       layout = concatStringsSep "," cfg.layout;
     };
 
-    home.file.".XCompose".text = let
-      concat = concatStringsSep "\n" cfg.xcompose;
-    in
+    home.file.".XCompose".text =
+      let
+        concat = concatStringsSep "\n" cfg.xcompose;
+      in
       mkIf (cfg.xcompose != null) concat;
   };
 }

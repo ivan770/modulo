@@ -1,9 +1,14 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkOption types;
-in {
+in
+{
   options.modulo.filesystem = {
     type = mkOption {
-      type = types.enum ["standard" "image"];
+      type = types.enum [
+        "standard"
+        "image"
+      ];
       default = "standard";
     };
   };

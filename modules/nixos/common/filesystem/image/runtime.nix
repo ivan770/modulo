@@ -2,18 +2,23 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf;
 
   cfg = config.modulo.filesystem.image;
   version = builtins.toString cfg.version;
-in {
+in
+{
   config = mkIf (config.modulo.filesystem.type == "image") {
     fileSystems = {
       "/" = {
         device = "none";
         fsType = "tmpfs";
-        options = ["size=${cfg.partitions.root.size}" "mode=755"];
+        options = [
+          "size=${cfg.partitions.root.size}"
+          "mode=755"
+        ];
       };
 
       # Required for UKI updates
@@ -32,7 +37,7 @@ in {
       "/nix/store" = {
         fsType = "none";
         device = "/usr";
-        options = ["bind"];
+        options = [ "bind" ];
         neededForBoot = true;
       };
 
@@ -53,10 +58,10 @@ in {
       services.udev-barrier = {
         description = "Trigger systemd-udevd and wait for device discovery";
 
-        requires = ["systemd-repart.service"];
-        after = ["systemd-repart.service"];
+        requires = [ "systemd-repart.service" ];
+        after = [ "systemd-repart.service" ];
 
-        wantedBy = ["initrd.target"];
+        wantedBy = [ "initrd.target" ];
         before = [
           "sysroot.mount"
           "sysusr-usr.mount"
@@ -125,6 +130,6 @@ in {
 
     # FIXME: console setup fails on image-based systems for some reason.
     # May be related: https://github.com/NixOS/nixpkgs/issues/312452
-    boot.kernelParams = ["systemd.mask=systemd-vconsole-setup.service"];
+    boot.kernelParams = [ "systemd.mask=systemd-vconsole-setup.service" ];
   };
 }

@@ -3,11 +3,13 @@
   lib,
   options,
   ...
-}: let
+}:
+let
   inherit (lib) getExe mkIf;
 
   cfg = config.modulo.desktop.alacritty;
-in {
+in
+{
   options.modulo.desktop.alacritty = {
     inherit (options.programs.alacritty) enable settings;
   };
@@ -19,11 +21,13 @@ in {
       enable = true;
     };
 
-    modulo.desktop.terminal = let
-      generic = getExe config.programs.alacritty.package;
-    in {
-      inherit generic;
-      exec = "${generic} -e";
-    };
+    modulo.desktop.terminal =
+      let
+        generic = getExe config.programs.alacritty.package;
+      in
+      {
+        inherit generic;
+        exec = "${generic} -e";
+      };
   };
 }

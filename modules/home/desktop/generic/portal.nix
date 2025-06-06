@@ -3,9 +3,9 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     listToAttrs
     mkIf
     mkOption
@@ -25,10 +25,11 @@
       ];
     };
   };
-in {
+in
+{
   options.modulo.desktop.portal = {
     flavor = mkOption {
-      type = types.enum ["wlr"];
+      type = types.enum [ "wlr" ];
       description = ''
         XDG Desktop portal configuration preset.
       '';
@@ -40,12 +41,9 @@ in {
       enable = true;
       xdgOpenUsePortal = true;
 
-      config.common =
-        {
-          default = ["gtk"];
-        }
-        // (listToAttrs
-          (map (h: nameValuePair h [cfg.flavor]) presets.${cfg.flavor}.handlers));
+      config.common = {
+        default = [ "gtk" ];
+      } // (listToAttrs (map (h: nameValuePair h [ cfg.flavor ]) presets.${cfg.flavor}.handlers));
 
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk
@@ -66,7 +64,7 @@ in {
     systemd.user.services.xdg-document-portal = {
       Unit = {
         Description = "Document portal";
-        PartOf = ["graphical-session.target"];
+        PartOf = [ "graphical-session.target" ];
       };
 
       Service = {
@@ -74,7 +72,7 @@ in {
         Slice = "session.slice";
       };
 
-      Install.WantedBy = ["graphical-session.target"];
+      Install.WantedBy = [ "graphical-session.target" ];
     };
   };
 }

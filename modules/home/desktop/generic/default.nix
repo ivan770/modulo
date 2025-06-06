@@ -3,16 +3,26 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit (lib) mkEnableOption mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.desktop;
-in {
+in
+{
   options.modulo.desktop = {
     enable = mkEnableOption "desktop support";
 
     theme = mkOption {
-      type = types.enum ["dark" "light"];
+      type = types.enum [
+        "dark"
+        "light"
+      ];
       description = ''
         Preferred desktop color theme.
       '';
@@ -20,7 +30,7 @@ in {
 
     associations = mkOption {
       type = types.attrsOf types.str;
-      default = {};
+      default = { };
       description = ''
         Application associations with MIME types.
       '';
@@ -43,12 +53,10 @@ in {
     gtk = {
       enable = true;
 
-      gtk3.extraConfig.gtk-application-prefer-dark-theme =
-        mkIf (cfg.theme == "dark") true;
+      gtk3.extraConfig.gtk-application-prefer-dark-theme = mkIf (cfg.theme == "dark") true;
 
       gtk4 = {
-        extraConfig.gtk-application-prefer-dark-theme =
-          mkIf (cfg.theme == "dark") true;
+        extraConfig.gtk-application-prefer-dark-theme = mkIf (cfg.theme == "dark") true;
 
         # Round corners are removed to make GTK 4 windows look better on tiling WMs.
         extraCss = ''
@@ -63,9 +71,7 @@ in {
     };
 
     dconf.settings."org/gnome/desktop/interface".color-scheme =
-      if cfg.theme == "dark"
-      then "prefer-dark"
-      else "prefer-light";
+      if cfg.theme == "dark" then "prefer-dark" else "prefer-light";
 
     fonts.fontconfig.enable = true;
 

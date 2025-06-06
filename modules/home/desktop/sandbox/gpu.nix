@@ -3,9 +3,9 @@
   lib,
   sloth,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkIf
     mkOption
@@ -14,7 +14,8 @@
     ;
 
   cfg = config.modulo.gpu;
-in {
+in
+{
   options.modulo.gpu = {
     enable = mkEnableOption "GPU propagation";
 
@@ -49,9 +50,9 @@ in {
         ];
       };
 
-      extraStorePaths =
-        [cfg.driverPackage]
-        ++ optional (cfg.driverPackage32Bit != null) cfg.driverPackage32Bit;
+      extraStorePaths = [
+        cfg.driverPackage
+      ] ++ optional (cfg.driverPackage32Bit != null) cfg.driverPackage32Bit;
     };
   };
 }

@@ -2,7 +2,9 @@
   inputs,
   lib,
   ...
-}: pkgs: prev: let
+}:
+pkgs: prev:
+let
   src = pkgs.applyPatches {
     name = "patched-nixpak";
     src = inputs.nixpak;
@@ -20,7 +22,8 @@
   patchedNixpak = import inputs.flake-compat {
     inherit src;
   };
-in {
+in
+{
   mkNixPak = patchedNixpak.outputs.lib.nixpak {
     inherit lib pkgs;
   };

@@ -2,10 +2,11 @@
   lib,
   pkgs,
   ...
-}: {
+}:
+{
   environment = {
-    defaultPackages = lib.mkForce [];
-    systemPackages = [pkgs.doas-sudo-shim];
+    defaultPackages = lib.mkForce [ ];
+    systemPackages = [ pkgs.doas-sudo-shim ];
   };
 
   systemd.coredump.extraConfig = ''
@@ -22,7 +23,7 @@
       # remember password authentications for some short time.
       extraRules = lib.mkForce [
         {
-          groups = ["wheel"];
+          groups = [ "wheel" ];
           persist = true;
         }
       ];

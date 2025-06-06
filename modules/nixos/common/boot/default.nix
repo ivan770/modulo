@@ -2,11 +2,18 @@
   lib,
   config,
   ...
-}: let
-  inherit (lib) mkDefault mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    mkDefault
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.boot;
-in {
+in
+{
   options.modulo.boot = {
     timeout = mkOption {
       type = types.ints.unsigned;

@@ -3,11 +3,19 @@
   lib,
   sloth,
   ...
-}: let
-  inherit (lib) mkEnableOption mkIf mkMerge mkOption types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkMerge
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.permissions;
-in {
+in
+{
   options.modulo.permissions = {
     dconf = mkEnableOption "dconf access";
     document = mkEnableOption "Document Portal propagation";
@@ -57,8 +65,8 @@ in {
       ];
 
       rules = {
-        call."org.freedesktop.portal.*" = ["*"];
-        broadcast."org.freedesktop.portal.*" = ["@/org/freedesktop/portal/*"];
+        call."org.freedesktop.portal.*" = [ "*" ];
+        broadcast."org.freedesktop.portal.*" = [ "@/org/freedesktop/portal/*" ];
       };
     };
   };

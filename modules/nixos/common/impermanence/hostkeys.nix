@@ -1,6 +1,8 @@
-{config, ...}: let
+{ config, ... }:
+let
   cfg = config.modulo.impermanence;
-in {
+in
+{
   # sops-nix executes secretsForUsers before impermanence module activation,
   # leading to incorrect user password provision on startup.
   # To fix this behaviour, host keys can be simply moved to persistent directory explicitly.

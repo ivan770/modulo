@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.desktop.sound;
-in {
+in
+{
   options.modulo.desktop.sound = {
     enable = mkEnableOption "audio playback support";
   };

@@ -2,9 +2,11 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) getExe mkOption types;
-in {
+in
+{
   options.modulo.desktop.systemd = {
     runner = mkOption {
       internal = true;

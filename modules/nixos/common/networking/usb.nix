@@ -2,18 +2,18 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.networking.usb;
-in {
+in
+{
   options.modulo.networking.usb = {
-    enable =
-      mkEnableOption "usb tethering support"
-      // {
-        default = !config.modulo.headless.enable;
-        defaultText = "!config.modulo.headless.enable";
-      };
+    enable = mkEnableOption "usb tethering support" // {
+      default = !config.modulo.headless.enable;
+      defaultText = "!config.modulo.headless.enable";
+    };
   };
 
   config = mkIf (config.modulo.networking.enable && cfg.enable) {

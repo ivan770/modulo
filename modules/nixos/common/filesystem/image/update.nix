@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf;
 
   cfg = config.modulo.filesystem.image;
-in {
+in
+{
   systemd.sysupdate = mkIf (config.modulo.filesystem.type == "image" && cfg.update.enable) {
     enable = true;
 

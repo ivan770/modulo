@@ -4,9 +4,9 @@
   osConfig,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     mkEnableOption
     mkIf
     mkOption
@@ -26,29 +26,32 @@
       "-DBUILD_LV2_PLUGIN=OFF"
     ];
 
-    outputs = ["out"];
+    outputs = [ "out" ];
 
-    buildInputs =
-      (old.buildInputs or [])
-      ++ [pkgs.juce];
+    buildInputs = (old.buildInputs or [ ]) ++ [ pkgs.juce ];
 
     # rnnoise README file recommends using target-specific optimizations.
     # These flags are somewhat arbitrary though.
-    NIX_CFLAGS_COMPILE =
-      (old.NIX_CFLAGS_COMPILE or [])
-      ++ ["-march=znver3" "-mtune=znver4"];
+    NIX_CFLAGS_COMPILE = (old.NIX_CFLAGS_COMPILE or [ ]) ++ [
+      "-march=znver3"
+      "-mtune=znver4"
+    ];
 
     # Default postInstall includes separate outputs for plugins,
     # but since we build one plugin in the first place, just rely on $out.
     postInstall = "";
   });
-in {
+in
+{
   options.modulo.desktop.sound = {
     noiseCancellation = {
       enable = mkEnableOption "PipeWire noise cancellation";
 
       output = mkOption {
-        type = types.enum ["mono" "stereo"];
+        type = types.enum [
+          "mono"
+          "stereo"
+        ];
         default = "mono";
         description = ''
           Output type.

@@ -1,10 +1,12 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkOption types;
-in {
+in
+{
   options.modulo.secrets = {
     applications = mkOption {
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
       description = ''
         User-specific application secrets.
       '';

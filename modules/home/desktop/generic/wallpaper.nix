@@ -1,6 +1,8 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkOption types;
-in {
+in
+{
   options.modulo.desktop.wallpaper = {
     file = mkOption {
       type = types.path;

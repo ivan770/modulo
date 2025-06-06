@@ -23,8 +23,8 @@ _: {
   systemd.services.test-reboot = {
     description = "Initialize test reboot process.";
 
-    wantedBy = ["multi-user.target"];
-    after = ["multi-user.target"];
+    wantedBy = [ "multi-user.target" ];
+    after = [ "multi-user.target" ];
 
     script = ''
       systemctl reboot --no-block

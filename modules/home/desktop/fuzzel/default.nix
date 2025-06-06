@@ -2,9 +2,9 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     getExe
     hasAttrByPath
     mkEnableOption
@@ -15,13 +15,14 @@
     ;
 
   cfg = config.modulo.desktop.fuzzel;
-in {
+in
+{
   options.modulo.desktop.fuzzel = {
     enable = mkEnableOption "fuzzel menu support";
 
     settings = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Fuzzel user-specific configuration.
       '';
@@ -35,21 +36,23 @@ in {
       enable = true;
     };
 
-    modulo.desktop.menu = let
-      inherit (config.modulo.desktop.system) runner;
+    modulo.desktop.menu =
+      let
+        inherit (config.modulo.desktop.system) runner;
 
-      bin = getExe config.programs.fuzzel.package;
-      terminal = config.modulo.desktop.terminal.exec;
+        bin = getExe config.programs.fuzzel.package;
+        terminal = config.modulo.desktop.terminal.exec;
 
-      promptFlag =
-        optionalString
-        (hasAttrByPath ["main" "prompt"] cfg.settings)
-        " -p \"${cfg.settings.main.prompt}\"";
-    in {
-      # INI configuration file doesn't preserve the trailing space
-      # in prompt strings correctly, so we pass it as a flag here.
-      application = ''${bin} --launch-prefix="${runner} " -T "${terminal}"${promptFlag}'';
-      generic = prompt: ''${bin} -d -p "${prompt} "'';
-    };
+        promptFlag = optionalString (hasAttrByPath [
+          "main"
+          "prompt"
+        ] cfg.settings) " -p \"${cfg.settings.main.prompt}\"";
+      in
+      {
+        # INI configuration file doesn't preserve the trailing space
+        # in prompt strings correctly, so we pass it as a flag here.
+        application = ''${bin} --launch-prefix="${runner} " -T "${terminal}"${promptFlag}'';
+        generic = prompt: ''${bin} -d -p "${prompt} "'';
+      };
   };
 }

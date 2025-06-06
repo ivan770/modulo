@@ -4,9 +4,9 @@
   options,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     concatStringsSep
     nameValuePair
     mapAttrs'
@@ -18,7 +18,8 @@
 
   cfg = config.modulo.browsers.chromium;
 
-  enabledFeatures = concatStringsSep "," ([
+  enabledFeatures = concatStringsSep "," (
+    [
       # VA-API video acceleration
       "AcceleratedVideoDecodeLinuxGL"
       "AcceleratedVideoDecodeLinuxZeroCopyGL"
@@ -39,122 +40,127 @@
       # PipeWire camera support
       "WebRtcPipeWireCamera"
     ]
-    ++ cfg.enabledFeatures);
+    ++ cfg.enabledFeatures
+  );
 
   disabledFeatures = concatStringsSep "," [
     "UseChromeOSDirectVideoDecoder"
   ];
 
-  flags =
-    [
-      "--enable-features=${enabledFeatures}"
-      "--disable-features=${disabledFeatures}"
+  flags = [
+    "--enable-features=${enabledFeatures}"
+    "--disable-features=${disabledFeatures}"
 
-      # Vulkan
-      "--use-gl=angle"
-      "--use-angle=vulkan"
+    # Vulkan
+    "--use-gl=angle"
+    "--use-angle=vulkan"
 
-      # Wayland
-      "--ozone-platform=wayland"
-      "--gtk-version=4"
+    # Wayland
+    "--ozone-platform=wayland"
+    "--gtk-version=4"
 
-      # Offload stuff to GPU
-      "--enable-gpu-rasterization"
-      "--enable-zero-copy"
-      "--disable-gpu-driver-bug-workaround"
-      "--disable-gpu-driver-bug-workarounds"
-      "--enable-accelerated-video-decode"
-      "--ignore-gpu-blocklist"
-    ]
-    ++ cfg.commandLineArgs;
+    # Offload stuff to GPU
+    "--enable-gpu-rasterization"
+    "--enable-zero-copy"
+    "--disable-gpu-driver-bug-workaround"
+    "--disable-gpu-driver-bug-workarounds"
+    "--enable-accelerated-video-decode"
+    "--ignore-gpu-blocklist"
+  ] ++ cfg.commandLineArgs;
 
-  writeJSON = config:
-    pkgs.writeText "chromium.json" (
-      builtins.toJSON config
-    );
+  writeJSON = config: pkgs.writeText "chromium.json" (builtins.toJSON config);
 
   extensions = pkgs.linkFarm "extensions" (
-    mapAttrs' (id: {
-      version,
-      crx,
-    }:
+    mapAttrs' (
+      id:
+      {
+        version,
+        crx,
+      }:
       nameValuePair "${id}.json" (writeJSON {
         external_version = version;
         external_crx = builtins.toString crx;
-      }))
-    cfg.extensions
+      })
+    ) cfg.extensions
   );
 
   etcConfig = pkgs.linkFarm "chromium-config" {
-    "policies/managed/policy.json" =
-      writeJSON cfg.policies;
+    "policies/managed/policy.json" = writeJSON cfg.policies;
 
-    initial_preferences =
-      writeJSON cfg.initialPrefs;
+    initial_preferences = writeJSON cfg.initialPrefs;
   };
 
   appId = "org.chromium.Chromium";
 
   package =
-    (config.modulo.desktop.sandbox.builder ({sloth, ...}: let
-      chromiumConfigDir =
-        sloth.concat'
-        sloth.xdgConfigHome
-        "/chromium";
-    in {
-      app.package = pkgs.ungoogled-chromium.override {
-        commandLineArgs = concatStringsSep " " flags;
-        enableWideVine = true;
-      };
-
-      flatpak.appId = appId;
-
-      modulo = {
-        gpu.enable = true;
-        locale.enable = true;
-        permissions = {
-          document = true;
-          mpris = "chromium";
+    (config.modulo.desktop.sandbox.builder (
+      { sloth, ... }:
+      let
+        chromiumConfigDir = sloth.concat' sloth.xdgConfigHome "/chromium";
+      in
+      {
+        app.package = pkgs.ungoogled-chromium.override {
+          commandLineArgs = concatStringsSep " " flags;
+          enableWideVine = true;
         };
-        syscallFilter.nestedSandboxing = true;
-      };
 
-      bubblewrap = {
-        bind = {
-          rw = [
-            # Persistent data
-            [
-              (sloth.mkdir sloth.appDataDir)
-              chromiumConfigDir
-            ]
+        flatpak.appId = appId;
 
-            # Temporary data
-            # This directory is in the "bind.rw" section instead of
-            # the "tmpfs" section because it has to be shared across multiple
-            # Chromium instances.
-            [
-              (sloth.mkdir sloth.appCacheDir)
-              (sloth.concat' sloth.xdgCacheHome "/chromium")
-            ]
+        modulo = {
+          gpu.enable = true;
+          locale.enable = true;
+          permissions = {
+            document = true;
+            mpris = "chromium";
+          };
+          syscallFilter.nestedSandboxing = true;
+        };
+
+        bubblewrap = {
+          bind = {
+            rw = [
+              # Persistent data
+              [
+                (sloth.mkdir sloth.appDataDir)
+                chromiumConfigDir
+              ]
+
+              # Temporary data
+              # This directory is in the "bind.rw" section instead of
+              # the "tmpfs" section because it has to be shared across multiple
+              # Chromium instances.
+              [
+                (sloth.mkdir sloth.appCacheDir)
+                (sloth.concat' sloth.xdgCacheHome "/chromium")
+              ]
+            ];
+
+            ro = [
+              [
+                "${etcConfig}"
+                "/etc/chromium"
+              ]
+              [
+                "${extensions}"
+                (sloth.concat' chromiumConfigDir "/External Extensions")
+              ]
+            ];
+          };
+
+          sockets = {
+            wayland = true;
+            pulse = true;
+          };
+
+          extraStorePaths = [
+            etcConfig
+            extensions
           ];
-
-          ro = [
-            ["${etcConfig}" "/etc/chromium"]
-            ["${extensions}" (sloth.concat' chromiumConfigDir "/External Extensions")]
-          ];
         };
-
-        sockets = {
-          wayland = true;
-          pulse = true;
-        };
-
-        extraStorePaths = [etcConfig extensions];
-      };
-    }))
-    .config
-    .env;
-in {
+      }
+    )).config.env;
+in
+{
   options.modulo.browsers.chromium = {
     inherit (options.programs.chromium) commandLineArgs;
 
@@ -162,31 +168,33 @@ in {
 
     enabledFeatures = mkOption {
       type = types.listOf types.str;
-      default = [];
+      default = [ ];
       description = ''
         Features to append to the "enabled-features" flag.
       '';
     };
 
     extensions = mkOption {
-      type = types.attrsOf (types.submodule {
-        options = {
-          version = mkOption {
-            type = types.str;
-            description = ''
-              Extension version.
-            '';
-          };
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            version = mkOption {
+              type = types.str;
+              description = ''
+                Extension version.
+              '';
+            };
 
-          crx = mkOption {
-            type = types.package;
-            description = ''
-              CRX file package.
-            '';
+            crx = mkOption {
+              type = types.package;
+              description = ''
+                CRX file package.
+              '';
+            };
           };
-        };
-      });
-      default = {};
+        }
+      );
+      default = { };
       description = ''
         Chromium extensions to install.
       '';
@@ -194,7 +202,7 @@ in {
 
     policies = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Chromium enterprise policies to apply.
       '';
@@ -202,7 +210,7 @@ in {
 
     initialPrefs = mkOption {
       type = types.attrs;
-      default = {};
+      default = { };
       description = ''
         Chromium initial preferences to apply.
         These preferences apply only once during the browser first run.

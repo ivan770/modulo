@@ -3,9 +3,9 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     attrNames
     getExe
     head
@@ -17,7 +17,8 @@
     ;
 
   cfg = config.modulo.desktop;
-in {
+in
+{
   options.modulo.desktop = {
     enable = mkEnableOption "generic desktop configuration";
 
@@ -32,7 +33,7 @@ in {
   config = mkIf cfg.enable {
     assertions = [
       {
-        assertion = config.snowfallorg.users != {};
+        assertion = config.snowfallorg.users != { };
         message = ''
           At least one activated user is required to use the desktop configuration.
         '';
@@ -72,10 +73,10 @@ in {
 
     # Fonts are meant to be set up using Home Manager.
     fonts.fontconfig.defaultFonts = {
-      monospace = [];
-      serif = [];
-      sansSerif = [];
-      emoji = [];
+      monospace = [ ];
+      serif = [ ];
+      sansSerif = [ ];
+      emoji = [ ];
     };
 
     boot.enableContainers = false;
@@ -115,7 +116,7 @@ in {
       dbus = {
         enable = true;
         implementation = "broker";
-        packages = [pkgs.gcr];
+        packages = [ pkgs.gcr ];
       };
 
       # Activated by greetd by default.
@@ -124,25 +125,28 @@ in {
       greetd = {
         enable = true;
 
-        settings = let
-          users = attrNames config.snowfallorg.users;
-        in {
-          default_session =
-            if (length users) > 1
-            then {
-              command = ''
-                ${getExe pkgs.greetd.tuigreet} \
-                  --time \
-                  --cmd "${cfg.command}"
-              '';
+        settings =
+          let
+            users = attrNames config.snowfallorg.users;
+          in
+          {
+            default_session =
+              if (length users) > 1 then
+                {
+                  command = ''
+                    ${getExe pkgs.greetd.tuigreet} \
+                      --time \
+                      --cmd "${cfg.command}"
+                  '';
 
-              user = "greeter";
-            }
-            else {
-              inherit (cfg) command;
-              user = head users;
-            };
-        };
+                  user = "greeter";
+                }
+              else
+                {
+                  inherit (cfg) command;
+                  user = head users;
+                };
+          };
       };
     };
   };

@@ -3,17 +3,17 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.syscallFilter;
-in {
+in
+{
   options.modulo.syscallFilter = {
-    enable =
-      mkEnableOption "syscall filtering"
-      // {
-        default = true;
-      };
+    enable = mkEnableOption "syscall filtering" // {
+      default = true;
+    };
 
     nestedSandboxing = mkEnableOption "nested sandboxing support";
   };

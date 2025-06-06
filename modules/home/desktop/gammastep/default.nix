@@ -3,11 +3,18 @@
   lib,
   pkgs,
   ...
-}: let
-  inherit (lib) mkEnableOption mkIf mkOption types;
+}:
+let
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
 
   cfg = config.modulo.desktop.gammastep;
-in {
+in
+{
   options.modulo.desktop.gammastep = {
     enable = mkEnableOption "gammastep daemon";
 
@@ -72,13 +79,13 @@ in {
         withRandr = false;
         withGeolocation = false;
         withAppIndicator = false;
-      })
-      .overrideAttrs (_: {
-        postInstall = ''
-          rm $out/share/applications/gammastep.desktop
-          rm $out/share/applications/gammastep-indicator.desktop
-        '';
-      });
+      }).overrideAttrs
+        (_: {
+          postInstall = ''
+            rm $out/share/applications/gammastep.desktop
+            rm $out/share/applications/gammastep-indicator.desktop
+          '';
+        });
 
     settings.general.brightness-night = cfg.nightBrightness;
   };

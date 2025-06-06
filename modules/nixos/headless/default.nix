@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.headless;
-in {
+in
+{
   options.modulo.headless = {
     enable = mkEnableOption "generic headless configuration";
   };

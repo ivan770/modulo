@@ -3,9 +3,9 @@
   inputs,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     attrNames
     concatStringsSep
     filterAttrs
@@ -24,79 +24,84 @@
     ;
 
   cfg = config.modulo.filesystem;
-in {
+in
+{
   options.modulo.filesystem = {
     disks = mkOption {
-      type = types.attrsOf (types.submodule {
-        options = {
-          boot = {
-            enable = mkOption {
+      type = types.attrsOf (
+        types.submodule {
+          options = {
+            boot = {
+              enable = mkOption {
+                type = types.bool;
+                default = true;
+                description = ''
+                  Determine whether to create a bootable vfat partition.
+                '';
+              };
+
+              size = mkOption {
+                type = types.str;
+                default = "512MiB";
+                description = ''
+                  Bootable partition size.
+                '';
+              };
+
+              mountpoint = mkOption {
+                type = types.str;
+                default = config.modulo.boot.systemd-boot.mountpoint;
+                description = ''
+                  Boot partition mountpoint.
+                '';
+              };
+            };
+
+            encrypted = mkOption {
               type = types.bool;
               default = true;
               description = ''
-                Determine whether to create a bootable vfat partition.
+                Determine whether to encrypt disk using LUKS.
               '';
             };
 
-            size = mkOption {
-              type = types.str;
-              default = "512MiB";
+            partitions = mkOption {
+              type = types.attrsOf (
+                types.submodule {
+                  options = {
+                    preset = mkOption {
+                      type = types.str;
+                      description = ''
+                        Partition preset name.
+                      '';
+                    };
+
+                    args = mkOption {
+                      type = types.attrs;
+                      default = { };
+                      description = ''
+                        Preset arguments.
+                      '';
+                    };
+                  };
+                }
+              );
               description = ''
-                Bootable partition size.
+                LVM pool configuration.
               '';
             };
 
-            mountpoint = mkOption {
+            ioScheduler = mkOption {
               type = types.str;
-              default = config.modulo.boot.systemd-boot.mountpoint;
+              default = "none";
               description = ''
-                Boot partition mountpoint.
+                IO scheduler used for this disk.
               '';
             };
           };
-
-          encrypted = mkOption {
-            type = types.bool;
-            default = true;
-            description = ''
-              Determine whether to encrypt disk using LUKS.
-            '';
-          };
-
-          partitions = mkOption {
-            type = types.attrsOf (types.submodule {
-              options = {
-                preset = mkOption {
-                  type = types.str;
-                  description = ''
-                    Partition preset name.
-                  '';
-                };
-
-                args = mkOption {
-                  type = types.attrs;
-                  default = {};
-                  description = ''
-                    Preset arguments.
-                  '';
-                };
-              };
-            });
-            description = ''
-              LVM pool configuration.
-            '';
-          };
-
-          ioScheduler = mkOption {
-            type = types.str;
-            default = "none";
-            description = ''
-              IO scheduler used for this disk.
-            '';
-          };
-        };
-      });
-      default = {};
+        }
+      );
+      default = { };
       description = ''
         Activated disks.
       '';
@@ -119,127 +124,145 @@ in {
     inputs.disko.nixosModules.disko
   ];
 
-  config = let
-    mkLUKSName = device: "crypt" + (replaceStrings ["/"] ["-"] device);
-  in
+  config =
+    let
+      mkLUKSName = device: "crypt" + (replaceStrings [ "/" ] [ "-" ] device);
+    in
     mkIf (config.modulo.filesystem.type == "standard") {
-      boot = let
-        encryptedDisks = filterAttrs (_: options: options.encrypted) cfg.disks;
-      in {
-        kernelParams =
-          optional (length (attrNames encryptedDisks) != 0) "rd.luks.options=timeout=0"
-          # Mask to prevent failed mount on /dev/gpt-auto-root
-          ++ ["systemd.gpt_auto=0"];
+      boot =
+        let
+          encryptedDisks = filterAttrs (_: options: options.encrypted) cfg.disks;
+        in
+        {
+          kernelParams =
+            optional (length (attrNames encryptedDisks) != 0) "rd.luks.options=timeout=0"
+            # Mask to prevent failed mount on /dev/gpt-auto-root
+            ++ [ "systemd.gpt_auto=0" ];
 
-        initrd.luks.devices = mapAttrs' (device: _:
-          nameValuePair (mkLUKSName device) {
-            allowDiscards = true;
-            bypassWorkqueues = true;
-            crypttabExtraOpts = ["fido2-device=auto"];
-          })
-        encryptedDisks;
-      };
-
-      disko.devices = let
-        mkVolumeGroupName = device: "vg" + (replaceStrings ["/"] ["-"] device);
-
-        presets = let
-          mkFsOptions = options: "-O " + (concatStringsSep "," options);
-
-          ext4 = {
-            mountpoint,
-            size ? "100%FREE",
-            encrypted,
-            ...
-          }: {
-            inherit size;
-
-            content = {
-              inherit mountpoint;
-
-              type = "filesystem";
-              format = "ext4";
-              mountOptions =
-                [
-                  "noatime"
-                  "commit=30"
-                ]
-                ++ optional encrypted "x-systemd.device-timeout=0";
-            };
-          };
-
-          f2fs = {
-            mountpoint,
-            size ? "100%FREE",
-            encrypted,
-            ...
-          }: {
-            inherit size;
-
-            content = {
-              inherit mountpoint;
-
-              type = "filesystem";
-              format = "f2fs";
-              mountOptions =
-                [
-                  "compress_algorithm=zstd:6"
-                  "compress_chksum"
-                  "atgc"
-                  "gc_merge"
-                  "lazytime"
-                  "noatime"
-                ]
-                ++ optional encrypted "x-systemd.device-timeout=0";
-              extraArgs = [
-                (mkFsOptions [
-                  "extra_attr"
-                  "inode_checksum"
-                  "sb_checksum"
-                  "compression"
-                ])
-              ];
-            };
-          };
-        in {
-          inherit ext4 f2fs;
-
-          ext4-nix = args:
-            ext4 (args
-              // {
-                mountpoint = "/nix";
-              });
-
-          f2fs-nix = args:
-            f2fs (args
-              // {
-                mountpoint = "/nix";
-              });
-
-          swap = {size ? "8G", ...}: {
-            inherit size;
-
-            content.type = "swap";
-          };
+          initrd.luks.devices = mapAttrs' (
+            device: _:
+            nameValuePair (mkLUKSName device) {
+              allowDiscards = true;
+              bypassWorkqueues = true;
+              crypttabExtraOpts = [ "fido2-device=auto" ];
+            }
+          ) encryptedDisks;
         };
 
-        lvm_vg = mapAttrs' (device: options:
-          nameValuePair (mkVolumeGroupName device) {
-            type = "lvm_vg";
-            lvs =
-              mapAttrs (
-                _: lvOptions:
-                  presets.${lvOptions.preset} (lvOptions.args
-                    // {
-                      inherit (options) encrypted;
-                    })
-              )
-              options.partitions;
-          })
-        cfg.disks;
+      disko.devices =
+        let
+          mkVolumeGroupName = device: "vg" + (replaceStrings [ "/" ] [ "-" ] device);
 
-        disk =
-          mapAttrs (device: options: {
+          presets =
+            let
+              mkFsOptions = options: "-O " + (concatStringsSep "," options);
+
+              ext4 =
+                {
+                  mountpoint,
+                  size ? "100%FREE",
+                  encrypted,
+                  ...
+                }:
+                {
+                  inherit size;
+
+                  content = {
+                    inherit mountpoint;
+
+                    type = "filesystem";
+                    format = "ext4";
+                    mountOptions = [
+                      "noatime"
+                      "commit=30"
+                    ] ++ optional encrypted "x-systemd.device-timeout=0";
+                  };
+                };
+
+              f2fs =
+                {
+                  mountpoint,
+                  size ? "100%FREE",
+                  encrypted,
+                  ...
+                }:
+                {
+                  inherit size;
+
+                  content = {
+                    inherit mountpoint;
+
+                    type = "filesystem";
+                    format = "f2fs";
+                    mountOptions = [
+                      "compress_algorithm=zstd:6"
+                      "compress_chksum"
+                      "atgc"
+                      "gc_merge"
+                      "lazytime"
+                      "noatime"
+                    ] ++ optional encrypted "x-systemd.device-timeout=0";
+                    extraArgs = [
+                      (mkFsOptions [
+                        "extra_attr"
+                        "inode_checksum"
+                        "sb_checksum"
+                        "compression"
+                      ])
+                    ];
+                  };
+                };
+            in
+            {
+              inherit ext4 f2fs;
+
+              ext4-nix =
+                args:
+                ext4 (
+                  args
+                  // {
+                    mountpoint = "/nix";
+                  }
+                );
+
+              f2fs-nix =
+                args:
+                f2fs (
+                  args
+                  // {
+                    mountpoint = "/nix";
+                  }
+                );
+
+              swap =
+                {
+                  size ? "8G",
+                  ...
+                }:
+                {
+                  inherit size;
+
+                  content.type = "swap";
+                };
+            };
+
+          lvm_vg = mapAttrs' (
+            device: options:
+            nameValuePair (mkVolumeGroupName device) {
+              type = "lvm_vg";
+              lvs = mapAttrs (
+                _: lvOptions:
+                presets.${lvOptions.preset} (
+                  lvOptions.args
+                  // {
+                    inherit (options) encrypted;
+                  }
+                )
+              ) options.partitions;
+            }
+          ) cfg.disks;
+
+          disk = mapAttrs (device: options: {
             inherit device;
 
             type = "disk";
@@ -257,58 +280,63 @@ in {
 
                     type = "filesystem";
                     format = "vfat";
-                    mountOptions = ["umask=0077"];
+                    mountOptions = [ "umask=0077" ];
                   };
                 };
-                DATA = let
-                  wrapLUKS = content:
-                    if options.encrypted
-                    then {
-                      inherit content;
+                DATA =
+                  let
+                    wrapLUKS =
+                      content:
+                      if options.encrypted then
+                        {
+                          inherit content;
 
-                      type = "luks";
-                      name = mkLUKSName device;
-                      extraOpenArgs = ["--allow-discards"];
-                    }
-                    else content;
-                in {
-                  label = "DATA";
-                  size = "100%";
-                  content = wrapLUKS {
-                    type = "lvm_pv";
-                    vg = mkVolumeGroupName device;
+                          type = "luks";
+                          name = mkLUKSName device;
+                          extraOpenArgs = [ "--allow-discards" ];
+                        }
+                      else
+                        content;
+                  in
+                  {
+                    label = "DATA";
+                    size = "100%";
+                    content = wrapLUKS {
+                      type = "lvm_pv";
+                      vg = mkVolumeGroupName device;
+                    };
                   };
-                };
               };
             };
-          })
-          cfg.disks;
-      in {
-        inherit lvm_vg disk;
+          }) cfg.disks;
+        in
+        {
+          inherit lvm_vg disk;
 
-        nodev."/" = {
-          fsType = "tmpfs";
-          mountOptions = [
-            "size=${cfg.root.size}"
-            "mode=755"
-            "nodev"
-            "nosuid"
-          ];
+          nodev."/" = {
+            fsType = "tmpfs";
+            mountOptions = [
+              "size=${cfg.root.size}"
+              "mode=755"
+              "nodev"
+              "nosuid"
+            ];
+          };
         };
-      };
 
       services = {
-        udev.extraRules = let
-          rules =
-            mapAttrsToList
-            (name: {ioScheduler, ...}:
+        udev.extraRules =
+          let
+            rules = mapAttrsToList (
+              name:
+              { ioScheduler, ... }:
               concatStringsSep ", " [
                 ''ACTION=="add|change"''
                 ''KERNEL=="${removePrefix "/dev/" name}"''
                 ''ATTR{queue/scheduler}="${ioScheduler}"''
-              ])
-            cfg.disks;
-        in
+              ]
+            ) cfg.disks;
+          in
           concatStringsSep "\n" rules;
 
         udisks2.enable = mkIf cfg.udisks2 true;

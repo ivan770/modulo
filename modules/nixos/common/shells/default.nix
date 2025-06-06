@@ -2,9 +2,9 @@
   config,
   lib,
   ...
-}: let
-  inherit
-    (lib)
+}:
+let
+  inherit (lib)
     elem
     filterAttrs
     genAttrs
@@ -31,7 +31,8 @@
   programs = genAttrs supportedShells (shell: {
     enable = mkIf (elem shell activatedShellNames) true;
   });
-in {
+in
+{
   inherit programs;
 
   environment.shells = activatedShells;

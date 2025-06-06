@@ -2,7 +2,8 @@
   inputs,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) concatStrings foldr recursiveUpdate;
 
   consts = {
@@ -10,33 +11,37 @@
     dark = "000000";
   };
 
-  mkColor = {
-    config,
-    prefix ? null,
-    transparency ? null,
-  }: name: let
-    colorScheme = config.modulo.desktop.colors.theme;
+  mkColor =
+    {
+      config,
+      prefix ? null,
+      transparency ? null,
+    }:
+    name:
+    let
+      colorScheme = config.modulo.desktop.colors.theme;
 
-    source =
-      inputs.nix-colors.colorSchemes.${colorScheme}.palette.${name}
-      or consts.${name};
-  in
+      source = inputs.nix-colors.colorSchemes.${colorScheme}.palette.${name} or consts.${name};
+    in
     concatStrings [
       (toString prefix)
       source
       (toString transparency)
     ];
-in {
+in
+{
   inherit mkColor;
 
-  recursiveMerge = foldr recursiveUpdate {};
+  recursiveMerge = foldr recursiveUpdate { };
 
-  mkTransparentColor = {
-    config,
-    prefix ? null,
-  }: name: transparency:
+  mkTransparentColor =
+    {
+      config,
+      prefix ? null,
+    }:
+    name: transparency:
     (mkColor {
       inherit config prefix transparency;
     })
-    name;
+      name;
 }

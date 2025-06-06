@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.locale;
-in {
+in
+{
   options.modulo.locale = {
     enable = mkEnableOption "locale propagation";
   };
@@ -21,7 +23,7 @@ in {
         "/etc/zoneinfo"
       ];
 
-      extraStorePaths = [pkgs.tzdata];
+      extraStorePaths = [ pkgs.tzdata ];
     };
   };
 }

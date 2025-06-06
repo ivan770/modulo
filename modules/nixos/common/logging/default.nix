@@ -2,11 +2,13 @@
   config,
   lib,
   ...
-}: let
+}:
+let
   inherit (lib) mkOption types;
 
   cfg = config.modulo.logging;
-in {
+in
+{
   options.modulo.logging = {
     level = mkOption {
       type = types.enum [
@@ -26,7 +28,10 @@ in {
     };
 
     flavor = mkOption {
-      type = types.enum ["volatile" "persistent"];
+      type = types.enum [
+        "volatile"
+        "persistent"
+      ];
       default = "volatile";
       description = ''
         Preferred log storage.

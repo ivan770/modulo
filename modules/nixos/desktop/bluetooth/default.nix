@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkEnableOption mkIf;
 
   cfg = config.modulo.desktop.bluetooth;
-in {
+in
+{
   options.modulo.desktop.bluetooth = {
     enable = mkEnableOption "Bluetooth support";
     onStartup = mkEnableOption "automatically enable Bluetooth on startup";

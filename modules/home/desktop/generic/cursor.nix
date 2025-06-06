@@ -3,11 +3,13 @@
   lib,
   pkgs,
   ...
-}: let
+}:
+let
   inherit (lib) mkIf mkOption types;
 
   cfg = config.modulo.desktop.cursor;
-in {
+in
+{
   options.modulo.desktop.cursor = {
     # https://github.com/nix-community/home-manager/blob/134deb46abd5d0889d913b8509413f6f38b0811e/modules/config/home-cursor.nix#L11-L28
     package = mkOption {

@@ -1,6 +1,8 @@
-{lib, ...}: let
+{ lib, ... }:
+let
   inherit (lib) mkEnableOption mkOption types;
-in {
+in
+{
   options.modulo.filesystem.image = {
     name = mkOption {
       type = types.str;
@@ -59,7 +61,11 @@ in {
 
       data = {
         type = mkOption {
-          type = types.enum ["ext4" "btrfs" "xfs"];
+          type = types.enum [
+            "ext4"
+            "btrfs"
+            "xfs"
+          ];
           default = "ext4";
           description = ''
             Filesystem to use for the data partition.

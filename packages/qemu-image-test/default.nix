@@ -4,16 +4,22 @@
   qemu,
   runCommand,
   util-linux,
-}: let
+}:
+let
   systemConfig = inputs.self.nixosConfigurations.image-test.config;
 
   inherit (systemConfig.modulo.filesystem.image) name;
   version = builtins.toString systemConfig.modulo.filesystem.image.version;
   rawImage = "${systemConfig.system.build.image}/${name}_${version}.raw";
 in
-  runCommand "qemu-image-test" {
-    nativeBuildInputs = [qemu util-linux];
-  } ''
+runCommand "qemu-image-test"
+  {
+    nativeBuildInputs = [
+      qemu
+      util-linux
+    ];
+  }
+  ''
     fallocate -l 7G boot.raw
     dd if=${rawImage} of=boot.raw conv=notrunc
 
