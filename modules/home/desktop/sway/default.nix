@@ -76,7 +76,7 @@ in
       } cfg.config;
 
       extraConfigEarly = ''
-        set $term ${config.modulo.desktop.terminal.generic}
+        set $term ${config.modulo.desktop.terminal.wrapped}
         set $menu ${config.modulo.desktop.menu.application}
       '';
 
