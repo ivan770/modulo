@@ -122,32 +122,32 @@ in
       # Activated by greetd by default.
       displayManager.enable = false;
 
-      greetd = {
-        enable = true;
+      greetd =
+        let
+          users = attrNames config.snowfallorg.users;
+          autoLogin = (length users) == 1;
+        in
+        {
+          enable = true;
 
-        settings =
-          let
-            users = attrNames config.snowfallorg.users;
-          in
-          {
-            default_session =
-              if (length users) > 1 then
-                {
-                  command = ''
-                    ${getExe pkgs.greetd.tuigreet} \
-                      --time \
-                      --cmd "${cfg.command}"
-                  '';
+          settings = {
+            terminal = {
+              vt = "current";
+              switch = false;
+            };
 
-                  user = "greeter";
-                }
-              else
-                {
-                  inherit (cfg) command;
-                  user = head users;
-                };
+            default_session.command = ''
+              ${getExe pkgs.greetd.tuigreet} \
+                --time \
+                --cmd "${cfg.command}"
+            '';
+
+            initial_session = mkIf autoLogin {
+              inherit (cfg) command;
+              user = head users;
+            };
           };
-      };
+        };
     };
   };
 }
