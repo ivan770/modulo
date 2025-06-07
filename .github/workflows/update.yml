@@ -13,10 +13,10 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
       - name: Install Nix
-        uses: DeterminateSystems/nix-installer-action@v12
+        uses: DeterminateSystems/nix-installer-action@v17
       - name: Update flake.lock
         id: update
-        uses: DeterminateSystems/update-flake-lock@v23
+        uses: DeterminateSystems/update-flake-lock@v25
         with:
           pr-title: "Update flake.lock"
           pr-body: |
