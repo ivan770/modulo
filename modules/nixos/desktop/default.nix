@@ -12,8 +12,6 @@ let
     length
     mkEnableOption
     mkIf
-    mkOption
-    types
     ;
 
   cfg = config.modulo.desktop;
@@ -21,13 +19,6 @@ in
 {
   options.modulo.desktop = {
     enable = mkEnableOption "generic desktop configuration";
-
-    command = mkOption {
-      type = types.str;
-      description = ''
-        Desktop environment start command.
-      '';
-    };
   };
 
   config = mkIf cfg.enable {
@@ -126,6 +117,7 @@ in
         let
           users = attrNames config.snowfallorg.users;
           autoLogin = (length users) == 1;
+          command = "systemctl --user start wayland-wm.service --wait";
         in
         {
           enable = true;
@@ -139,11 +131,11 @@ in
             default_session.command = ''
               ${getExe pkgs.greetd.tuigreet} \
                 --time \
-                --cmd "${cfg.command}"
+                --cmd "${command}"
             '';
 
             initial_session = mkIf autoLogin {
-              inherit (cfg) command;
+              inherit command;
               user = head users;
             };
           };

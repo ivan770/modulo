@@ -2,11 +2,14 @@
   config,
   lib,
   options,
+  pkgs,
   ...
 }:
 let
   inherit (lib)
     concatStringsSep
+    getExe
+    getExe'
     mkEnableOption
     mkIf
     mkOption
@@ -81,32 +84,29 @@ in
       '';
 
       extraConfig =
+        let
+          variables = concatStringsSep " " config.wayland.windowManager.sway.systemd.variables;
+
+          postStart = [
+            "${getExe' pkgs.systemdMinimal "systemctl"} --user import-environment ${variables}"
+            "${getExe' pkgs.systemdMinimal "systemd-notify"} --ready"
+          ];
+        in
         cfg.extraConfig
         + ''
           bindswitch --locked --reload lid:on exec ${config.modulo.desktop.lock.suspend}
+          exec "${concatStringsSep ";" postStart}"
         '';
 
       wrapperFeatures.gtk = true;
 
-      # xdg-desktop-portal-gtk has broken app associations by default
-      # when the xdgOpenUsePortal option is activated.
-      # See https://github.com/NixOS/nixpkgs/issues/189851 for more info.
-      systemd.variables = options.wayland.windowManager.sway.systemd.variables.default ++ [ "PATH" ];
-
-      # FIXME: Remove hm-session-vars.sh loading as soon
-      # as a more correct way to load environment variables into Sway is
-      # introduced into HM.
-      extraSessionCommands = ''
-        [ -f "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh" ] && . "${config.home.profileDirectory}/etc/profile.d/hm-session-vars.sh"
-
-        export SDL_VIDEODRIVER=wayland
-        export QT_QPA_PLATFORM=wayland
-        export QT_WAYLAND_DISABLE_WINDOWDECORATION=1
-        export NIXOS_OZONE_WL=1
-        export _JAVA_AWT_WM_NONREPARENTING=1
-      '';
+      # systemd integration is implemented separately
+      systemd.enable = false;
     };
 
-    modulo.desktop.portal.flavor = "wlr";
+    modulo.desktop = {
+      portal.flavor = "wlr";
+      systemd.command = getExe config.wayland.windowManager.sway.package;
+    };
   };
 }

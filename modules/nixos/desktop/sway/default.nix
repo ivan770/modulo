@@ -14,10 +14,6 @@ in
   };
 
   config = mkIf cfg.enable {
-    # Explicitly start sway from PATH to ensure that extraSessionCommands
-    # are correctly executed when configured from HM.
-    modulo.desktop.command = "systemd-cat -t sway sway";
-
     security.pam.services.swaylock = { };
   };
 }
