@@ -95,7 +95,7 @@ in
         cfg.extraConfig
         + ''
           bindswitch --locked --reload lid:on exec ${config.modulo.desktop.lock.suspend}
-          exec "${concatStringsSep ";" postStart}"
+          exec_always "${concatStringsSep ";" postStart}"
         '';
 
       wrapperFeatures.gtk = true;
@@ -106,7 +106,10 @@ in
 
     modulo.desktop = {
       portal.flavor = "wlr";
-      systemd.command = getExe config.wayland.windowManager.sway.package;
+      systemd = {
+        startCommand = getExe config.wayland.windowManager.sway.package;
+        reloadCommand = "${getExe' config.wayland.windowManager.sway.package "swaymsg"} reload";
+      };
     };
   };
 }

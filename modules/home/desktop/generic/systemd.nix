@@ -15,7 +15,7 @@ let
 
   cfg = config.modulo.desktop.systemd;
 
-  env-loader = pkgs.writeShellScript "env-loader" ''
+  envLoader = pkgs.writeShellScript "env-loader" ''
     current=$(printenv)
 
     [ -f /etc/profile ] && . /etc/profile
@@ -26,13 +26,28 @@ let
 
     systemctl --user import-environment $changed
   '';
+
+  envLoaderDeps = [
+    pkgs.coreutils
+    pkgs.findutils
+    pkgs.gnused
+    pkgs.systemdMinimal
+  ];
 in
 {
   options.modulo.desktop.systemd = {
-    command = mkOption {
+    startCommand = mkOption {
       type = types.str;
       description = ''
-        Window manager command.
+        Window manager start command.
+      '';
+    };
+
+    reloadCommand = mkOption {
+      type = types.nullOr types.str;
+      default = null;
+      description = ''
+        Window manager config reload command.
       '';
     };
 
@@ -67,7 +82,8 @@ in
           Service = {
             Type = "notify";
             NotifyAccess = "all";
-            ExecStart = cfg.command;
+            ExecStart = cfg.startCommand;
+            ExecReload = mkIf (cfg.reloadCommand != null) cfg.reloadCommand;
             TimeoutStartSec = 10;
             TimeoutStopSec = 10;
             Slice = "session.slice";
@@ -86,8 +102,8 @@ in
           Service = {
             Type = "oneshot";
             RemainAfterExit = true;
-            Environment = [ "PATH=${makeBinPath [ pkgs.coreutils ]}" ];
-            ExecStart = env-loader;
+            Environment = [ "PATH=${makeBinPath envLoaderDeps}" ];
+            ExecStart = envLoader;
           };
 
           Install.RequiredBy = [ "graphical-session-pre.target" ];
