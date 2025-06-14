@@ -6,6 +6,7 @@
 }:
 let
   inherit (lib)
+    genAttrs
     getExe
     makeBinPath
     mkIf
@@ -48,6 +49,14 @@ in
       default = null;
       description = ''
         Window manager config reload command.
+      '';
+    };
+
+    forceSessionSlice = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        Units that should be forced to run in the `session.slice`.
       '';
     };
 
@@ -118,5 +127,16 @@ in
         _JAVA_AWT_WM_NONREPARENTING = 1;
       };
     };
+
+    xdg.configFile =
+      let
+        files = map (n: "systemd/user/${n}.d/session-slice.conf") cfg.forceSessionSlice;
+      in
+      genAttrs files (_: {
+        text = ''
+          [Service]
+          Slice=session.slice
+        '';
+      });
   };
 }

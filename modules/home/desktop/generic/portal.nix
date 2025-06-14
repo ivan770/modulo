@@ -18,6 +18,7 @@ let
   presets = {
     wlr = {
       package = pkgs.xdg-desktop-portal-wlr;
+      service = "xdg-desktop-portal-wlr.service";
 
       handlers = [
         "org.freedesktop.impl.portal.Screenshot"
@@ -50,6 +51,11 @@ in
         presets.${cfg.flavor}.package
       ];
     };
+
+    modulo.desktop.systemd.forceSessionSlice = [
+      "xdg-desktop-portal-gtk.service"
+      presets.${cfg.flavor}.service
+    ];
 
     # Override the default implementation of the xdg-document-portal.service
     # to fix missing /run/user/.../doc directories in sandboxed applications.

@@ -63,30 +63,36 @@ in
     };
   };
 
-  config.services.gammastep = mkIf cfg.enable {
-    inherit (cfg) temperature;
+  config = mkIf cfg.enable {
+    services.gammastep = {
+      enable = true;
 
-    enable = true;
+      inherit (cfg) temperature;
 
-    latitude = 0.0;
-    longitude = 0.0;
+      latitude = 0.0;
+      longitude = 0.0;
 
-    dawnTime = cfg.time.dawn;
-    duskTime = cfg.time.dusk;
+      dawnTime = cfg.time.dawn;
+      duskTime = cfg.time.dusk;
 
-    package =
-      (pkgs.gammastep.override {
-        withRandr = false;
-        withGeolocation = false;
-        withAppIndicator = false;
-      }).overrideAttrs
-        (_: {
-          postInstall = ''
-            rm $out/share/applications/gammastep.desktop
-            rm $out/share/applications/gammastep-indicator.desktop
-          '';
-        });
+      package =
+        (pkgs.gammastep.override {
+          withRandr = false;
+          withGeolocation = false;
+          withAppIndicator = false;
+        }).overrideAttrs
+          (_: {
+            postInstall = ''
+              rm $out/share/applications/gammastep.desktop
+              rm $out/share/applications/gammastep-indicator.desktop
+            '';
+          });
 
-    settings.general.brightness-night = cfg.nightBrightness;
+      settings.general.brightness-night = cfg.nightBrightness;
+    };
+
+    modulo.desktop.systemd.forceSessionSlice = [
+      "gammastep.service"
+    ];
   };
 }

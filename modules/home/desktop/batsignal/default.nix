@@ -36,17 +36,23 @@ in
     };
   };
 
-  config.services.batsignal = mkIf cfg.enable {
-    enable = true;
+  config = mkIf cfg.enable {
+    services.batsignal = {
+      enable = true;
 
-    extraArgs = [
-      "-e"
-      "-d"
-      "0"
-      "-w"
-      (toString cfg.thresholds.warning)
-      "-c"
-      (toString cfg.thresholds.critical)
+      extraArgs = [
+        "-e"
+        "-d"
+        "0"
+        "-w"
+        (toString cfg.thresholds.warning)
+        "-c"
+        (toString cfg.thresholds.critical)
+      ];
+    };
+
+    modulo.desktop.systemd.forceSessionSlice = [
+      "batsignal.service"
     ];
   };
 }
