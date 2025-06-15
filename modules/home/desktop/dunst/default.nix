@@ -123,63 +123,69 @@ in
     };
   };
 
-  config.services.dunst = mkIf cfg.enable {
-    enable = true;
+  config = mkIf cfg.enable {
+    services.dunst = {
+      enable = true;
 
-    settings =
-      let
-        mkConfig =
-          prefix: val:
-          listToAttrs (map (level: nameValuePair "${prefix}_${level}" (val level)) urgencyLevels);
+      settings =
+        let
+          mkConfig =
+            prefix: val:
+            listToAttrs (map (level: nameValuePair "${prefix}_${level}" (val level)) urgencyLevels);
 
-        colorConfig = mkConfig "urgency" (
-          level:
-          listToAttrs (
-            map (
-              color:
-              nameValuePair color (mkIf (cfg.settings.${level}.${color} != null) cfg.settings.${level}.${color})
-            ) colors
-          )
-        );
+          colorConfig = mkConfig "urgency" (
+            level:
+            listToAttrs (
+              map (
+                color:
+                nameValuePair color (mkIf (cfg.settings.${level}.${color} != null) cfg.settings.${level}.${color})
+              ) colors
+            )
+          );
 
-        soundConfig = mkConfig "sound" (
-          level:
-          mkIf (cfg.settings.${level}.sound != null) {
-            msg_urgency = level;
-            script = toString (
-              pkgs.writeShellScript "${level}-notification" ''
-                ${getExe' pkgs.pipewire "pw-play"} ${cfg.settings.${level}.sound}
-              ''
-            );
+          soundConfig = mkConfig "sound" (
+            level:
+            mkIf (cfg.settings.${level}.sound != null) {
+              msg_urgency = level;
+              script = toString (
+                pkgs.writeShellScript "${level}-notification" ''
+                  ${getExe' pkgs.pipewire "pw-play"} ${cfg.settings.${level}.sound}
+                ''
+              );
+            }
+          );
+        in
+        recursiveUpdate (
+          {
+            global = {
+              follow = "mouse";
+              enable_posix_regex = true;
+              dmenu = menu.generic "Action:";
+
+              mouse_left_click = "do_action";
+              mouse_middle_click = "none";
+              mouse_right_click = "close_current";
+
+              height = toString cfg.height;
+              offset = concatStringsSep "x" (
+                map toString [
+                  cfg.offset.horizontal
+                  cfg.offset.vertical
+                ]
+              );
+              gap_size = cfg.offset.gap;
+
+              frame_width = 0;
+              progress_bar_frame_width = 0;
+            };
           }
-        );
-      in
-      recursiveUpdate (
-        {
-          global = {
-            follow = "mouse";
-            enable_posix_regex = true;
-            dmenu = menu.generic "Action:";
+          // colorConfig
+          // soundConfig
+        ) cfg.extraConfig;
+    };
 
-            mouse_left_click = "do_action";
-            mouse_middle_click = "none";
-            mouse_right_click = "close_current";
-
-            height = toString cfg.height;
-            offset = concatStringsSep "x" (
-              map toString [
-                cfg.offset.horizontal
-                cfg.offset.vertical
-              ]
-            );
-            gap_size = cfg.offset.gap;
-
-            frame_width = 0;
-            progress_bar_frame_width = 0;
-          };
-        }
-        // colorConfig
-        // soundConfig
-      ) cfg.extraConfig;
+    modulo.desktop.systemd.forceSessionSlice = [
+      "dunst.service"
+    ];
   };
 }
