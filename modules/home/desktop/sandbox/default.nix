@@ -32,6 +32,7 @@ in
         {
           imports = [
             baseConfig
+            ./environment.nix
             ./fonts.nix
             ./gpu.nix
             ./gtk.nix

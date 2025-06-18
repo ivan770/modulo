@@ -25,5 +25,21 @@ in
 
       extraStorePaths = [ pkgs.tzdata ];
     };
+
+    modulo.environment.envPassthrough = [
+      "LANG"
+      "LC_ADDRESS"
+      "LC_COLLATE"
+      "LC_CTYPE"
+      "LC_MEASUREMENT"
+      "LC_MESSAGES"
+      "LC_MONETARY"
+      "LC_NAME"
+      "LC_NUMERIC"
+      "LC_PAPER"
+      "LC_TELEPHONE"
+      "LC_TIME"
+      "TZDIR"
+    ];
   };
 }
