@@ -8,32 +8,12 @@ let
   inherit (lib)
     genAttrs
     getExe
-    makeBinPath
     mkIf
     mkOption
     types
     ;
 
   cfg = config.modulo.desktop.systemd;
-
-  envLoader = pkgs.writeShellScript "env-loader" ''
-    current=$(printenv)
-
-    [ -f /etc/profile ] && . /etc/profile
-
-    changed=$(comm -23 <(printenv | sort) <(echo "$current" | sort) \
-      | sed 's/=.*//' \
-      | xargs)
-
-    systemctl --user import-environment $changed
-  '';
-
-  envLoaderDeps = [
-    pkgs.coreutils
-    pkgs.findutils
-    pkgs.gnused
-    pkgs.systemdMinimal
-  ];
 in
 {
   options.modulo.desktop.systemd = {
@@ -73,50 +53,45 @@ in
 
   config = mkIf config.modulo.desktop.enable {
     systemd.user = {
-      services = {
-        wayland-wm = {
-          Unit = {
-            Description = "Wayland compositor";
+      services.wayland-wm = {
+        Unit = {
+          Description = "Wayland compositor";
 
-            Requires = "graphical-session-pre.target";
-            After = "graphical-session-pre.target";
+          Requires = "graphical-session-pre.target";
+          After = "graphical-session-pre.target";
 
-            BindsTo = "graphical-session.target";
-            Before = "graphical-session.target";
-            PropagatesStopTo = "graphical-session.target";
+          BindsTo = "graphical-session.target";
+          Before = "graphical-session.target";
+          PropagatesStopTo = "graphical-session.target";
 
-            CollectMode = "inactive-or-failed";
-          };
-
-          Service = {
-            Type = "notify";
-            NotifyAccess = "all";
-            ExecStart = cfg.startCommand;
-            ExecReload = mkIf (cfg.reloadCommand != null) cfg.reloadCommand;
-            TimeoutStartSec = 10;
-            TimeoutStopSec = 10;
-            Slice = "session.slice";
-          };
+          CollectMode = "inactive-or-failed";
         };
 
-        env-loader = {
-          Unit = {
-            Description = "Shell profile loader";
-            Before = "graphical-session-pre.target";
-            RefuseManualStart = true;
-            StopWhenUnneeded = true;
-            CollectMode = "inactive-or-failed";
-          };
-
-          Service = {
-            Type = "oneshot";
-            RemainAfterExit = true;
-            Environment = [ "PATH=${makeBinPath envLoaderDeps}" ];
-            ExecStart = envLoader;
-          };
-
-          Install.RequiredBy = [ "graphical-session-pre.target" ];
+        Service = {
+          Type = "notify";
+          NotifyAccess = "all";
+          ExecStart = cfg.startCommand;
+          ExecReload = mkIf (cfg.reloadCommand != null) cfg.reloadCommand;
+          TimeoutStartSec = 10;
+          TimeoutStopSec = 10;
+          Slice = "session.slice";
         };
+      };
+
+      targets.graphical-session-post.Unit = {
+        Description = "Session services which should run after the graphical session is terminated";
+        DefaultDependencies = false;
+        StopWhenUnneeded = true;
+
+        Conflicts = [
+          "graphical-session.target"
+          "graphical-session-pre.target"
+        ];
+
+        After = [
+          "graphical-session.target"
+          "graphical-session-pre.target"
+        ];
       };
 
       sessionVariables = {
@@ -130,9 +105,15 @@ in
 
     xdg.configFile =
       let
-        files = map (n: "systemd/user/${n}.d/session-slice.conf") cfg.forceSessionSlice;
+        sessionSliceFiles = map (n: "systemd/user/${n}.d/session-slice.conf") cfg.forceSessionSlice;
       in
-      genAttrs files (_: {
+      {
+        "systemd/user/app-.service.d/order.conf".text = ''
+          [Unit]
+          After=wayland-wm.service graphical-session.target
+        '';
+      }
+      // genAttrs sessionSliceFiles (_: {
         text = ''
           [Service]
           Slice=session.slice

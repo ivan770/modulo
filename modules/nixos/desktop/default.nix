@@ -117,7 +117,7 @@ in
         let
           users = attrNames config.snowfallorg.users;
           autoLogin = (length users) == 1;
-          command = "systemctl --user start wayland-wm.service --wait";
+          command = getExe pkgs.modulo.desktop-init;
         in
         {
           enable = true;
