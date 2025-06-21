@@ -52,7 +52,12 @@ in
                 ]
               ];
 
-              ro = [ (sloth.concat' sloth.homeDir "/.XCompose") ];
+              ro = [
+                [
+                  (sloth.concat' sloth.homeDir' "/.XCompose")
+                  (sloth.concat' sloth.homeDir "/.XCompose")
+                ]
+              ];
             };
 
             bindEntireStore = lib.mkDefault false;
