@@ -10,6 +10,7 @@ let
     concatStringsSep
     getExe
     getExe'
+    mkDefault
     mkEnableOption
     mkIf
     mkOption
@@ -106,10 +107,13 @@ in
 
     modulo.desktop = {
       portal.flavor = "wlr";
+
       systemd = {
         startCommand = getExe config.wayland.windowManager.sway.package;
         reloadCommand = "${getExe' config.wayland.windowManager.sway.package "swaymsg"} reload";
       };
+
+      wlogout.enable = mkDefault true;
     };
   };
 }
