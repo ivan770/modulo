@@ -40,7 +40,6 @@ in
   config = mkIf config.modulo.desktop.enable {
     xdg.portal = {
       enable = true;
-      xdgOpenUsePortal = true;
 
       config.common = {
         default = [ "gtk" ];
@@ -50,6 +49,10 @@ in
         pkgs.xdg-desktop-portal-gtk
         presets.${cfg.flavor}.package
       ];
+    };
+
+    systemd.user.sessionVariables = {
+      NIXOS_XDG_OPEN_USE_PORTAL = 1;
     };
 
     modulo.desktop.systemd.forceSessionSlice = [
