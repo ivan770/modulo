@@ -26,11 +26,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1746226637,
-        "narHash": "sha256-pUh3NgUtB3u7WMIn2kHbe15uJ1Ova3dsr+17j+AwuhU=",
+        "lastModified": 1752936334,
+        "narHash": "sha256-uNHFXIkD0bRP5v4goEbDWgWntuxY1fGjS1y1w8LnTBs=",
         "owner": "ivan770",
         "repo": "bwrap-bpf-filter",
-        "rev": "a9d79d62825942dd5b74cb1a8353bb6f962736d3",
+        "rev": "43e3c2b4e801a67177bb0f39045ced8db89e4937",
         "type": "github"
       },
       "original": {
