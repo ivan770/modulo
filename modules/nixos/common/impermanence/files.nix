@@ -38,11 +38,13 @@ in
         directory = "/var/tmp";
         mode = "0777";
       }
-    ] ++ cfg.directories;
+    ]
+    ++ cfg.directories;
 
     files = [
       "/etc/machine-id"
-    ] ++ cfg.files;
+    ]
+    ++ cfg.files;
 
     users = mapAttrs (_: modules: modules.modulo.home-impermanence) config.home-manager.users;
   };

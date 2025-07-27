@@ -41,7 +41,8 @@ in
 
             settings = {
               port = exposedServices.main;
-            } // settings;
+            }
+            // settings;
 
             enableTCPIP = true;
 

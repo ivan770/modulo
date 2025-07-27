@@ -66,7 +66,8 @@ let
     "--disable-gpu-driver-bug-workarounds"
     "--enable-accelerated-video-decode"
     "--ignore-gpu-blocklist"
-  ] ++ cfg.commandLineArgs;
+  ]
+  ++ cfg.commandLineArgs;
 
   writeJSON = config: pkgs.writeText "chromium.json" (builtins.toJSON config);
 

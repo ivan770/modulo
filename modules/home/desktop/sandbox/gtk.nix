@@ -94,10 +94,11 @@ in
           XCURSOR_PATH = "${cfg.cursor.package}/share/icons";
         };
 
-        extraStorePaths =
-          [ cfg.cursor.package ]
-          ++ optional (cfg.gtk3Config != null) gtk3
-          ++ optional (cfg.gtk4Config != null) gtk4;
+        extraStorePaths = [
+          cfg.cursor.package
+        ]
+        ++ optional (cfg.gtk3Config != null) gtk3
+        ++ optional (cfg.gtk4Config != null) gtk4;
       };
   };
 }

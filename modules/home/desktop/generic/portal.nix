@@ -43,7 +43,8 @@ in
 
       config.common = {
         default = [ "gtk" ];
-      } // (listToAttrs (map (h: nameValuePair h [ cfg.flavor ]) presets.${cfg.flavor}.handlers));
+      }
+      // (listToAttrs (map (h: nameValuePair h [ cfg.flavor ]) presets.${cfg.flavor}.handlers));
 
       extraPortals = [
         pkgs.xdg-desktop-portal-gtk

@@ -175,7 +175,8 @@ in
                     mountOptions = [
                       "noatime"
                       "commit=30"
-                    ] ++ optional encrypted "x-systemd.device-timeout=0";
+                    ]
+                    ++ optional encrypted "x-systemd.device-timeout=0";
                   };
                 };
 
@@ -201,7 +202,8 @@ in
                       "gc_merge"
                       "lazytime"
                       "noatime"
-                    ] ++ optional encrypted "x-systemd.device-timeout=0";
+                    ]
+                    ++ optional encrypted "x-systemd.device-timeout=0";
                     extraArgs = [
                       (mkFsOptions [
                         "extra_attr"

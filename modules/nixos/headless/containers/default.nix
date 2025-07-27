@@ -159,13 +159,14 @@ in
           ephemeral = true;
           privateNetwork = true;
 
-          extraFlags =
-            [ "-U" ]
-            ++ (attrValues (
-              mapAttrs (
-                slot: mountPoint: "--bind ${cfg.dataDirectory}/${name}-${slot}:${mountPoint}:idmap"
-              ) serviceConfiguration.bindSlots
-            ));
+          extraFlags = [
+            "-U"
+          ]
+          ++ (attrValues (
+            mapAttrs (
+              slot: mountPoint: "--bind ${cfg.dataDirectory}/${name}-${slot}:${mountPoint}:idmap"
+            ) serviceConfiguration.bindSlots
+          ));
 
           specialArgs = userConfiguration.specialArgs // {
             inherit (networkConfiguration) exposedServices localAddress;

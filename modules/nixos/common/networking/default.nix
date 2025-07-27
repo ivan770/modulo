@@ -231,27 +231,25 @@ in
 
             enable = true;
 
-            networkConfig =
-              {
-                LLMNR = false;
-                MulticastDNS = false;
+            networkConfig = {
+              LLMNR = false;
+              MulticastDNS = false;
 
-                LinkLocalAddressing = "ipv6";
-                IPv6AcceptRA = true;
-              }
-              // optionalAttrs options.wireless {
-                # Wireless networks may have an extended downtime period,
-                # so we wait for 5 seconds before losing carrier status for the current interface.
-                IgnoreCarrierLoss = "5s";
-              };
+              LinkLocalAddressing = "ipv6";
+              IPv6AcceptRA = true;
+            }
+            // optionalAttrs options.wireless {
+              # Wireless networks may have an extended downtime period,
+              # so we wait for 5 seconds before losing carrier status for the current interface.
+              IgnoreCarrierLoss = "5s";
+            };
 
-            linkConfig =
-              {
-                RequiredForOnline = if (options.onlineStatus == null) then "no" else options.onlineStatus;
-              }
-              // optionalAttrs (isString options.macAddress) {
-                MACAddress = options.macAddress;
-              };
+            linkConfig = {
+              RequiredForOnline = if (options.onlineStatus == null) then "no" else options.onlineStatus;
+            }
+            // optionalAttrs (isString options.macAddress) {
+              MACAddress = options.macAddress;
+            };
 
             # By default, networks managed by networkd use noqueue.
             # Most Linux distros use fq-codel by default.

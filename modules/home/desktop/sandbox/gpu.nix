@@ -52,7 +52,8 @@ in
 
       extraStorePaths = [
         cfg.driverPackage
-      ] ++ optional (cfg.driverPackage32Bit != null) cfg.driverPackage32Bit;
+      ]
+      ++ optional (cfg.driverPackage32Bit != null) cfg.driverPackage32Bit;
     };
   };
 }
