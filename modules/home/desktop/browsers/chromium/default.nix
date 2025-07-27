@@ -108,6 +108,7 @@ let
         flatpak.appId = appId;
 
         modulo = {
+          audio.enable = true;
           gpu.enable = true;
           locale.enable = true;
           permissions = {
@@ -148,10 +149,7 @@ let
             ];
           };
 
-          sockets = {
-            wayland = true;
-            pulse = true;
-          };
+          sockets.wayland = true;
 
           extraStorePaths = [
             etcConfig
