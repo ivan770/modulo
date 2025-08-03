@@ -65,15 +65,20 @@ in
           PropagatesStopTo = "graphical-session.target";
 
           CollectMode = "inactive-or-failed";
+
+          X-SwitchMethod = "reload";
         };
 
         Service = {
           Type = "notify";
           NotifyAccess = "all";
+
           ExecStart = cfg.startCommand;
           ExecReload = mkIf (cfg.reloadCommand != null) cfg.reloadCommand;
+
           TimeoutStartSec = 10;
           TimeoutStopSec = 10;
+
           Slice = "session.slice";
         };
       };
