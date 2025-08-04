@@ -13,17 +13,21 @@
   '';
 
   # Delegate all systemd-logind actions to WMs
-  services.logind = lib.modulo.recursiveMerge (
-    map
-      (button: {
-        "${button}Key" = "ignore";
-        "${button}KeyLongPress" = "ignore";
-      })
-      [
-        "hibernate"
-        "power"
-        "reboot"
-        "suspend"
-      ]
-  );
+  services.logind =
+    lib.modulo.recursiveMerge (
+      map
+        (button: {
+          "${button}Key" = "ignore";
+          "${button}KeyLongPress" = "ignore";
+        })
+        [
+          "hibernate"
+          "power"
+          "reboot"
+          "suspend"
+        ]
+    )
+    // {
+      killUserProcesses = true;
+    };
 }
