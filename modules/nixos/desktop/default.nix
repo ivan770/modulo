@@ -103,6 +103,11 @@ in
 
     programs.dconf.enable = true;
 
+    systemd.oomd = {
+      enable = true;
+      enableUserSlices = true;
+    };
+
     services = {
       dbus = {
         enable = true;
