@@ -5,7 +5,9 @@
   ...
 }:
 let
-  inherit (lib) getExe' mkOption types;
+  inherit (lib) mkIf mkOption types;
+
+  cfg = config.modulo.desktop.lock;
 in
 {
   options.modulo.desktop.lock = {
@@ -16,18 +18,44 @@ in
         Optional desktop lock command to use during the suspend process.
       '';
     };
+  };
 
-    suspend = mkOption {
-      internal = true;
-      readOnly = true;
-      type = types.path;
-      default = pkgs.writeShellScript "suspend" ''
-        ${config.modulo.desktop.lock.command}
-        ${getExe' pkgs.systemd "systemctl"} suspend
-      '';
-      description = ''
-        Lock and suspend command.
-      '';
+  config = mkIf (config.modulo.desktop.enable && cfg.command != null) {
+    home.packages = [ pkgs.systemd-lock-handler ];
+
+    systemd.user.services = {
+      systemd-lock-handler = {
+        Unit.Description = "Mapper from logind events to systemd";
+
+        Service = {
+          Type = "notify";
+          ExecStart = "${pkgs.systemd-lock-handler}/lib/systemd-lock-handler";
+          Restart = "on-failure";
+          RestartSec = 5;
+          Slice = "session.slice";
+        };
+
+        Install.RequiredBy = [ "wayland-wm.service" ];
+      };
+
+      lock-screen = {
+        Unit = {
+          Description = "Desktop screen lock";
+          OnSuccess = "unlock.target";
+          PartOf = "lock.target";
+          After = "lock.target";
+        };
+
+        Service = {
+          Type = "forking";
+          ExecStart = cfg.command;
+          Restart = "on-failure";
+          RestartSec = 0;
+          Slice = "session.slice";
+        };
+
+        Install.WantedBy = [ "lock.target" ];
+      };
     };
   };
 }

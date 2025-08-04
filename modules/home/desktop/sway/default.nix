@@ -95,7 +95,6 @@ in
         in
         cfg.extraConfig
         + ''
-          bindswitch --locked --reload lid:on exec ${config.modulo.desktop.lock.suspend}
           exec_always "${concatStringsSep ";" postStart}"
         '';
 

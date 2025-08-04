@@ -44,9 +44,8 @@ in
 
       layout =
         let
-          inherit (config.modulo.desktop) lock;
-
           systemctl = getExe' pkgs.systemd "systemctl";
+          loginctl = getExe' pkgs.systemd "loginctl";
         in
         [
           {
@@ -62,12 +61,12 @@ in
           {
             text = "Suspend";
             label = "suspend";
-            action = lock.suspend;
+            action = "${systemctl} suspend";
           }
           {
             text = "Lock";
             label = "lock";
-            action = lock.command;
+            action = "${loginctl} lock-session";
           }
         ];
     };
