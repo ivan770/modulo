@@ -1,11 +1,17 @@
 {
   lib,
+  pkgs,
   ...
 }:
+let
+  sudoShim = pkgs.writeShellScriptBin "sudo" ''
+    run0 --background= "$@"
+  '';
+in
 {
   environment = {
     defaultPackages = lib.mkForce [ ];
-    systemPackages = [ ];
+    systemPackages = [ sudoShim ];
   };
 
   systemd.coredump.extraConfig = ''
