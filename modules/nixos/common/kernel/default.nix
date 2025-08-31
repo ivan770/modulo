@@ -1,4 +1,5 @@
-_: {
+{ config, ... }:
+{
   boot = {
     kernel.sysctl = {
       # Disable "Magic SysRq key"
@@ -7,6 +8,10 @@ _: {
       # Ensure that legacy TIOCSTI is unavailable
       # This prevents some bubblewrap-related attacks with untrusted code.
       "dev.tty.legacy_tiocsti" = false;
+
+      # Restrict ptrace scope to privileged users on headless devices.
+      # On desktops, ptrace if useful for debugging.
+      "kernel.yama.ptrace_scope" = if config.modulo.headless.enable then 2 else 1;
 
       # Common recommendations
       "fs.protected_fifos" = 2;
@@ -18,7 +23,6 @@ _: {
       "kernel.dmesg_restrict" = true;
       "kernel.perf_event_paranoid" = 3;
       "kernel.unprivileged_bpf_disabled" = 1;
-      "kernel.yama.ptrace_scope" = 2;
     };
 
     kernelParams = [
