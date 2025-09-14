@@ -1,6 +1,17 @@
-{ config, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   boot = {
+    # Reasonable default kernel to use on desktop/headless systems.
+    # Specific systems with special requirements may override the value.
+    kernelPackages = lib.mkDefault (
+      if config.modulo.headless.enable then pkgs.linuxPackages_6_12 else pkgs.linuxPackages_6_16
+    );
+
     kernel.sysctl = {
       # Disable "Magic SysRq key"
       "kernel.sysrq" = 0;
