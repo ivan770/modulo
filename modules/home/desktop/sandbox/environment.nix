@@ -19,7 +19,6 @@ let
   vars = cfg.envPassthrough ++ [
     "_JAVA_AWT_WM_NONREPARENTING"
     "DBUS_SESSION_BUS_ADDRESS"
-    "DISPLAY"
     "GTK_A11Y"
     "NIXOS_OZONE_WL"
     "NIXOS_XDG_OPEN_USE_PORTAL"

@@ -40,6 +40,7 @@ in
             ./locale.nix
             ./permissions.nix
             ./syscallFilter.nix
+            ./x11.nix
           ];
 
           etc.sslCertificates.enable = lib.mkDefault true;
