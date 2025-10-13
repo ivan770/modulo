@@ -19,6 +19,11 @@ in
     ProcessSizeMax=0
   '';
 
-  # Use run0.
-  security.sudo.enable = false;
+  security = {
+    # Polkit is required for run0 to function properly.
+    polkit.enable = true;
+
+    # Use run0.
+    sudo.enable = false;
+  };
 }
