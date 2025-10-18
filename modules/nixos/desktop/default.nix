@@ -91,6 +91,7 @@ in
         "nowatchdog"
         "tsc=nowatchdog"
         "audit=0"
+        "preempt=full"
       ];
 
       blacklistedKernelModules = [
