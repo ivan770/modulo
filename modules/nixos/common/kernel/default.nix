@@ -9,7 +9,7 @@
     # Reasonable default kernel to use on desktop/headless systems.
     # Specific systems with special requirements may override the value.
     kernelPackages = lib.mkDefault (
-      if config.modulo.headless.enable then pkgs.linuxPackages_6_12 else pkgs.linuxPackages_6_16
+      if config.modulo.headless.enable then pkgs.linuxPackages_6_12 else pkgs.linuxPackages_6_17
     );
 
     kernel.sysctl = {
