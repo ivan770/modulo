@@ -12,6 +12,7 @@ let
     mkOption
     nameValuePair
     optionalAttrs
+    substring
     types
     ;
 
@@ -57,6 +58,14 @@ in
                 default = true;
                 description = ''
                   Whether to use DNS server information received from DHCP server.
+                '';
+              };
+
+              anonymize = mkOption {
+                type = types.bool;
+                default = true;
+                description = ''
+                  Whether to anonymize DHCP requests to reduce fingerprinting.
                 '';
               };
             };
@@ -112,6 +121,21 @@ in
               description = ''
                 Set MAC address for the current interface.
                 Null value implies the usage of the default MAC address value.
+              '';
+            };
+
+            macAddressPolicy = mkOption {
+              type =
+                with types;
+                enum [
+                  "auto"
+                  "random"
+                  "none"
+                ];
+              default = "auto";
+              description = ''
+                Set the MAC address policy if the `macAddress` value is not provided.
+                `auto` utilizes random MAC address if the DHCP client anonymization is enabled.
               '';
             };
 
@@ -221,89 +245,145 @@ in
   ];
 
   config = mkIf cfg.enable {
-    systemd.network = {
-      networks = mapAttrs' (
-        name: options:
-        let
-          baseConfig = {
-            inherit name;
-            inherit (options) address;
-
-            enable = true;
-
-            networkConfig = {
-              LLMNR = false;
-              MulticastDNS = false;
-
-              LinkLocalAddressing = "ipv6";
-              IPv6AcceptRA = true;
-            }
-            // optionalAttrs options.wireless {
-              # Wireless networks may have an extended downtime period,
-              # so we wait for 5 seconds before losing carrier status for the current interface.
-              IgnoreCarrierLoss = "5s";
+    systemd.network =
+      let
+        mkName = name: substring 0 8 (hashString "sha256" name);
+      in
+      {
+        links = mapAttrs' (
+          name: options:
+          let
+            baseConfig = {
+              matchConfig.OriginalName = name;
             };
 
-            linkConfig = {
-              RequiredForOnline = if (options.onlineStatus == null) then "no" else options.onlineStatus;
-            }
-            // optionalAttrs (isString options.macAddress) {
-              MACAddress = options.macAddress;
+            staticMacAddress = optionalAttrs (isString options.macAddress) {
+              linkConfig.MACAddress = options.macAddress;
             };
 
-            # By default, networks managed by networkd use noqueue.
-            # Most Linux distros use fq-codel by default.
-            fairQueueingControlledDelayConfig.Parent = "root";
-
-            # FIXME: Is DHCPv6 really necessary?
-            ipv6AcceptRAConfig.DHCPv6Client = "always";
-          };
-
-          dhcpClient = optionalAttrs (options.dhcp == "client") {
-            networkConfig.DHCP = "yes";
-          };
-
-          linkDNS = optionalAttrs (options.dhcp == "client" && !options.dhcpClient.dns) {
-            dhcpV4Config.UseDNS = false;
-            dhcpV6Config.UseDNS = false;
-            ipv6AcceptRAConfig.UseDNS = false;
-          };
-
-          dhcpServer = optionalAttrs (options.dhcp == "server") {
-            networkConfig = {
-              DHCPServer = "yes";
-
-              # Assume that packet forwarding is required on interfaces
-              # that have DHCP server enabled.
-              IPMasquerade = "both";
-            };
-
-            dhcpServerConfig =
+            configuredMacAddress =
               let
-                EmitDNS = isString options.dhcpServer.dns;
+                shouldUseRandom =
+                  options.macAddressPolicy == "random"
+                  || (
+                    options.macAddressPolicy == "auto"
+                    && options.dhcp == "client"
+                    && options.dhcpClient.anonymize
+                    # Ignore wireless networks since randomization is handled by iwd.
+                    && !options.wireless
+                  );
               in
-              {
-                inherit EmitDNS;
-
-                PoolSize = options.dhcpServer.poolSize;
-                PoolOffset = options.dhcpServer.poolOffset;
-              }
-              // optionalAttrs EmitDNS {
-                DNS = options.dhcpServer.dns;
+              optionalAttrs (options.macAddress == null) {
+                linkConfig.MACAddressPolicy = if shouldUseRandom then "random" else "none";
               };
-          };
-        in
-        nameValuePair (hashString "md5" name) (recursiveMerge [
-          baseConfig
-          dhcpClient
-          linkDNS
-          dhcpServer
-          options.extraConfig
-        ])
-      ) cfg.interfaces;
 
-      wait-online.enable = false;
-    };
+            # Default iwd link file retains the original kernel name, mimic that behavior here.
+            wirelessName = optionalAttrs options.wireless {
+              linkConfig.NamePolicy = "keep kernel";
+            };
+          in
+          nameValuePair "10-${mkName name}" (recursiveMerge [
+            baseConfig
+            staticMacAddress
+            configuredMacAddress
+            wirelessName
+          ])
+        ) cfg.interfaces;
+
+        networks = mapAttrs' (
+          name: options:
+          let
+            baseConfig = {
+              inherit name;
+              inherit (options) address;
+
+              enable = true;
+
+              matchConfig.Name = name;
+
+              networkConfig = {
+                LLMNR = false;
+                MulticastDNS = false;
+
+                LinkLocalAddressing = "ipv6";
+                IPv6AcceptRA = true;
+              }
+              // optionalAttrs options.wireless {
+                # Wireless networks may have an extended downtime period,
+                # so we wait for 5 seconds before losing carrier status for the current interface.
+                IgnoreCarrierLoss = "5s";
+              };
+
+              linkConfig = {
+                RequiredForOnline = if (options.onlineStatus == null) then "no" else options.onlineStatus;
+              };
+
+              # By default, networks managed by networkd use noqueue.
+              # Most Linux distros use fq-codel by default.
+              fairQueueingControlledDelayConfig.Parent = "root";
+
+              # FIXME: Is DHCPv6 really necessary?
+              ipv6AcceptRAConfig.DHCPv6Client = "always";
+            };
+
+            dhcpClient = optionalAttrs (options.dhcp == "client") {
+              networkConfig.DHCP = "yes";
+            };
+
+            linkDNS = optionalAttrs (options.dhcp == "client" && !options.dhcpClient.dns) {
+              dhcpV4Config.UseDNS = false;
+              dhcpV6Config.UseDNS = false;
+              ipv6AcceptRAConfig.UseDNS = false;
+            };
+
+            anonymize = optionalAttrs (options.dhcp == "client" && options.dhcpClient.anonymize) {
+              dhcpV4Config.Anonymize = true;
+
+              # Anonymize is not available for DHCPv6 according to the documentation.
+              # The values here are also limited by the nixpkgs config checker.
+              dhcpV6Config = {
+                RapidCommit = false;
+                SendHostname = false;
+                UseNTP = false;
+              };
+            };
+
+            dhcpServer = optionalAttrs (options.dhcp == "server") {
+              networkConfig = {
+                DHCPServer = "yes";
+
+                # Assume that packet forwarding is required on interfaces
+                # that have DHCP server enabled.
+                IPMasquerade = "both";
+              };
+
+              dhcpServerConfig =
+                let
+                  EmitDNS = isString options.dhcpServer.dns;
+                in
+                {
+                  inherit EmitDNS;
+
+                  PoolSize = options.dhcpServer.poolSize;
+                  PoolOffset = options.dhcpServer.poolOffset;
+                }
+                // optionalAttrs EmitDNS {
+                  DNS = options.dhcpServer.dns;
+                };
+            };
+          in
+          nameValuePair (mkName name) (recursiveMerge [
+            baseConfig
+            dhcpClient
+            linkDNS
+            anonymize
+            dhcpServer
+            options.extraConfig
+          ])
+        ) cfg.interfaces;
+
+        wait-online.enable = false;
+      };
 
     boot.kernel.sysctl = {
       # Network congestion configuration
