@@ -69,10 +69,14 @@ in
 
         output."*".bg = "${config.modulo.desktop.wallpaper.file} fill";
 
-        seat."*".xcursor_theme = concatStringsSep " " [
-          config.modulo.desktop.cursor.name
-          (toString config.modulo.desktop.cursor.size)
-        ];
+        seat."*" = {
+          shortcuts_inhibitor = "disable";
+
+          xcursor_theme = concatStringsSep " " [
+            config.modulo.desktop.cursor.name
+            (toString config.modulo.desktop.cursor.size)
+          ];
+        };
 
         bars = [ ];
 
