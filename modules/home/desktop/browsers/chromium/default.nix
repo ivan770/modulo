@@ -149,8 +149,6 @@ let
             ];
           };
 
-          sockets.wayland = true;
-
           extraStorePaths = [
             etcConfig
             extensions

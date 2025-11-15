@@ -9,7 +9,6 @@ let
   inherit (lib)
     mkEnableOption
     mkIf
-    mkMerge
     mkOption
     optional
     types
@@ -74,19 +73,16 @@ in
         # are generated once more for sandboxed apps.
         gtk3 = pkgs.writeText "gtk3-config" cfg.gtk3Config;
         gtk4 = pkgs.writeText "gtk4-config" cfg.gtk4Config;
+
+        mkGtkBind =
+          version: config:
+          optional (cfg."gtk${version}Config" != null) [
+            (builtins.toString config)
+            (sloth.concat' sloth.xdgConfigHome "/gtk-${version}.0/settings.ini")
+          ];
       in
       {
-        bind.ro = mkMerge [
-          (mkIf (cfg.gtk3Config != null) [
-            (sloth.concat' sloth.xdgConfigHome "/gtk-3.0/settings.ini")
-            (builtins.toString gtk3)
-          ])
-
-          (mkIf (cfg.gtk4Config != null) [
-            (sloth.concat' sloth.xdgConfigHome "/gtk-4.0/settings.ini")
-            (builtins.toString gtk4)
-          ])
-        ];
+        bind.ro = (mkGtkBind "3" gtk3) ++ (mkGtkBind "4" gtk4);
 
         env = {
           XCURSOR_THEME = builtins.toString cfg.cursor.name;

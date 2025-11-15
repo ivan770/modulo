@@ -10,6 +10,7 @@ let
     mkIf
     mkMerge
     mkOption
+    optional
     types
     ;
 
@@ -19,7 +20,9 @@ in
   options.modulo.permissions = {
     dconf = mkEnableOption "dconf access";
     document = mkEnableOption "Document Portal propagation";
+    machineId = mkEnableOption "systemd machine id propagation";
     notifications = mkEnableOption "desktop notifications";
+    osInfo = mkEnableOption "OS information propagation";
 
     mpris = mkOption {
       type = types.nullOr types.str;
@@ -32,9 +35,13 @@ in
   };
 
   config = {
-    bubblewrap.bind.rw = mkIf cfg.document [
-      (sloth.concat' sloth.runtimeDir "/doc")
-    ];
+    bubblewrap.bind = {
+      rw = mkIf cfg.document [
+        (sloth.concat' sloth.runtimeDir "/doc")
+      ];
+
+      ro = (optional cfg.machineId "/etc/machine-id") ++ (optional cfg.osInfo "/etc/os-release");
+    };
 
     dbus = {
       policies = mkMerge [

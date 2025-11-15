@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   sloth,
   ...
 }:
@@ -11,6 +12,7 @@ let
     mkIf
     mkOption
     nameValuePair
+    subtractLists
     types
     ;
 
@@ -29,7 +31,8 @@ let
     "XDG_RUNTIME_DIR"
   ];
 
-  envPassthrough = listToAttrs (map (v: nameValuePair v (sloth.env' v)) vars);
+  allowedVars = subtractLists cfg.envExclude vars;
+  envPassthrough = listToAttrs (map (v: nameValuePair v (sloth.env' v)) allowedVars);
 in
 {
   options.modulo.environment = {
@@ -44,17 +47,51 @@ in
         Environment variables to pass to the sandbox as-is.
       '';
     };
-  };
 
-  config = mkIf cfg.enable {
-    bubblewrap = {
-      hostname = "computer";
-
-      clearEnv = true;
-      env = envPassthrough // {
-        HOME = "/home/user";
-        USER = "user";
-      };
+    envExclude = mkOption {
+      type = types.listOf types.str;
+      default = [ ];
+      description = ''
+        Environment variables to exclude from passthrough.
+      '';
     };
   };
+
+  config =
+    let
+      passwd = pkgs.writeText "sandbox-passwd" ''
+        user:x:1000:100::/home/user:${lib.getExe' pkgs.shadow "nologin"}
+      '';
+
+      group = pkgs.writeText "sandbox-group" ''
+        users:x:100:
+      '';
+    in
+    mkIf cfg.enable {
+      bubblewrap = {
+        hostname = "computer";
+
+        clearEnv = true;
+        env = envPassthrough // {
+          HOME = "/home/user";
+          USER = "user";
+        };
+
+        bind.ro = [
+          [
+            (builtins.toString passwd)
+            "/etc/passwd"
+          ]
+          [
+            (builtins.toString group)
+            "/etc/group"
+          ]
+        ];
+
+        extraStorePaths = [
+          passwd
+          group
+        ];
+      };
+    };
 }

@@ -26,44 +26,10 @@ in
       config =
         {
           lib,
-          sloth,
           ...
         }:
         {
-          imports = [
-            baseConfig
-            ./audio.nix
-            ./environment.nix
-            ./fonts.nix
-            ./gpu.nix
-            ./gtk.nix
-            ./locale.nix
-            ./permissions.nix
-            ./syscallFilter.nix
-            ./x11.nix
-          ];
-
-          etc.sslCertificates.enable = lib.mkDefault true;
-
-          bubblewrap = {
-            bind = {
-              rw = [
-                [
-                  (sloth.mkdir (sloth.concat' sloth.appDir "/tmp"))
-                  "/tmp"
-                ]
-              ];
-
-              ro = [
-                [
-                  (sloth.concat' sloth.homeDir' "/.XCompose")
-                  (sloth.concat' sloth.homeDir "/.XCompose")
-                ]
-              ];
-            };
-
-            bindEntireStore = lib.mkDefault false;
-          };
+          imports = [ baseConfig ] ++ (lib.fileset.toList (lib.fileset.fileFilter (f: f.hasExt "nix") ./.));
 
           modulo = {
             fonts.fonts = config.modulo.desktop.fonts.packages;
