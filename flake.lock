@@ -61,6 +61,7 @@
       }
     },
     "flake-compat": {
+      "flake": false,
       "locked": {
         "lastModified": 1761588595,
         "narHash": "sha256-XKUZz9zewJNUj46b4AJdiRZJAvSZ0Dqj2BNfXvFlJC4=",
@@ -83,11 +84,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1736143030,
-        "narHash": "sha256-+hu54pAoLDEZT9pjHlqL9DNzWz0NbUn8NEAHP7PQPzU=",
+        "lastModified": 1762980239,
+        "narHash": "sha256-8oNVE8TrD19ulHinjaqONf9QWCKK+w4url56cdStMpM=",
         "owner": "hercules-ci",
         "repo": "flake-parts",
-        "rev": "b905f6fc23a9051a6e1b741e1438dbfc0634c6de",
+        "rev": "52a2caecc898d0b46b2b905f058ccc5081f842da",
         "type": "github"
       },
       "original": {
@@ -144,11 +145,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1736917206,
-        "narHash": "sha256-JTBWmyGf8K1Rwb+gviHIUzRJk/sITtT+72HXFkTZUjo=",
+        "lastModified": 1762440648,
+        "narHash": "sha256-rfufj1K9c9/nZmCPPUkuGPGKX5glVrAy/poySGc+GLk=",
         "owner": "hercules-ci",
         "repo": "hercules-ci-effects",
-        "rev": "afd0a42e8c61ebb56899315ee4084a8b2e4ff425",
+        "rev": "4a76236652f1e867265757b5026682253c4b6e6e",
         "type": "github"
       },
       "original": {
@@ -238,11 +239,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1750281322,
-        "narHash": "sha256-b6UKWlpiVpQRM5D+GDrcYjuYBzgAwVWLqJQFOyexTlQ=",
+        "lastModified": 1763241052,
+        "narHash": "sha256-ujlT8dYA2rSVRLXzZkGSuCaa8We2R24whqKs7RuMww0=",
         "owner": "ivan770",
         "repo": "nixpak",
-        "rev": "57bffd7129c63dac9853ecc49bf7e06bffe6ee48",
+        "rev": "44877ef960be63c317bce44dfa43ded3f219ed33",
         "type": "github"
       },
       "original": {
@@ -271,7 +272,6 @@
       "inputs": {
         "bwrap-bpf-filter": "bwrap-bpf-filter",
         "disko": "disko",
-        "flake-compat": "flake-compat",
         "flake-utils-plus": "flake-utils-plus",
         "home-manager": "home-manager",
         "impermanence": "impermanence",
@@ -310,9 +310,7 @@
     },
     "snowfall": {
       "inputs": {
-        "flake-compat": [
-          "flake-compat"
-        ],
+        "flake-compat": "flake-compat",
         "flake-utils-plus": [
           "flake-utils-plus"
         ],

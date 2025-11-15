@@ -43,20 +43,17 @@
     nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
 
     flake-utils-plus.url = "github:gytis-ivaskevicius/flake-utils-plus";
-    flake-compat.url = "github:edolstra/flake-compat";
     snowfall = {
       url = "github:snowfallorg/lib";
       inputs = {
         nixpkgs.follows = "nixpkgs";
         flake-utils-plus.follows = "flake-utils-plus";
-        flake-compat.follows = "flake-compat";
       };
     };
   };
 
   outputs =
     {
-      nixpkgs,
       snowfall,
       ...
     }@inputs:

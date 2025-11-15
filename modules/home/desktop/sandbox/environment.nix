@@ -50,8 +50,7 @@ in
     bubblewrap = {
       hostname = "computer";
 
-      shareEnv = false;
-
+      clearEnv = true;
       env = envPassthrough // {
         HOME = "/home/user";
         USER = "user";
