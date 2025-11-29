@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (pkgs.hostPlatform) efiArch;
+  inherit (pkgs.stdenv.hostPlatform) efiArch;
 
   cfg = config.modulo.filesystem.image;
 
@@ -47,7 +47,7 @@ in
 
         "20-store" = {
           storePaths = [ config.system.build.toplevel ];
-          stripNixStorePrefix = true;
+          nixStorePrefix = "/";
           repartConfig = {
             Type = "linux-generic";
             Label = "${cfg.name}_${version}";

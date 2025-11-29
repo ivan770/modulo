@@ -1,13 +1,12 @@
 {
-  buildPlatform,
   bwrap-bpf-filter,
-  hostPlatform,
   lib,
   runCommand,
+  stdenv,
 }:
 { nestedSandboxing }:
 let
-  generator = bwrap-bpf-filter.packages.${buildPlatform.system}.default;
+  generator = bwrap-bpf-filter.packages.${stdenv.buildPlatform.system}.default;
   flags = lib.optional nestedSandboxing "--nested-sandboxing";
 
   targetArch = {
@@ -19,6 +18,6 @@ runCommand "modulo-sandbox-bpf"
     nativeBuildInputs = [ generator ];
   }
   ''
-    bwrap-bpf-filter ${targetArch.${hostPlatform.system}} \
+    bwrap-bpf-filter ${targetArch.${stdenv.hostPlatform.system}} \
       $out ${lib.concatStringsSep " " flags}
   ''

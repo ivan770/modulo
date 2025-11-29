@@ -36,7 +36,7 @@ in
       "/var/log"
       {
         directory = "/var/tmp";
-        mode = "0777";
+        mode = "0755";
       }
     ]
     ++ cfg.directories;

@@ -15,13 +15,4 @@ in
         attrsets.attrByPath path (attrsets.attrByPath path (final.substituteDeps drv attrs) final) attrs
       )
     );
-
-  substituteFromNixpkgs =
-    src: package: attrs:
-    let
-      externalNixpkgs = import src {
-        inherit (final) buildPlatform hostPlatform system;
-      };
-    in
-    final.substituteDeps externalNixpkgs.${package} attrs;
 }

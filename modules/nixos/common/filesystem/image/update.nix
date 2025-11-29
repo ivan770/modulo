@@ -40,7 +40,7 @@ in
         Source = {
           Type = "url-file";
           Path = cfg.update.url;
-          MatchPattern = "${cfg.name}_@v.store-${pkgs.hostPlatform.efiArch}.raw";
+          MatchPattern = "${cfg.name}_@v.store-${pkgs.stdenv.hostPlatform.efiArch}.raw";
         };
 
         Target = {

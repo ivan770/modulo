@@ -129,13 +129,8 @@ in
           enable = true;
 
           settings = {
-            terminal = {
-              vt = "current";
-              switch = false;
-            };
-
             default_session.command = ''
-              ${getExe pkgs.greetd.tuigreet} \
+              ${getExe pkgs.tuigreet} \
                 --time \
                 --cmd "${command}"
             '';

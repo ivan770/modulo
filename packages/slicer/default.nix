@@ -1,5 +1,5 @@
 {
-  hostPlatform,
   inputs,
+  stdenv,
 }:
-inputs.slicer.packages.${hostPlatform.system}.default
+inputs.slicer.packages.${stdenv.hostPlatform.system}.default

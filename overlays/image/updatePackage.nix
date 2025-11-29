@@ -1,6 +1,6 @@
 {
-  hostPlatform,
   runCommand,
+  stdenv,
 }:
 {
   name,
@@ -9,7 +9,7 @@
   uki,
 }:
 let
-  inherit (hostPlatform) efiArch;
+  inherit (stdenv.hostPlatform) efiArch;
 in
 runCommand "update-package" { } ''
   mkdir -p $out
