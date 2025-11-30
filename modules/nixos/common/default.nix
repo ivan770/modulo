@@ -17,8 +17,8 @@
     lib.modulo.recursiveMerge (
       map
         (button: {
-          "${button}Key" = "ignore";
-          "${button}KeyLongPress" = "ignore";
+          "Handle${button}Key" = "ignore";
+          "Handle${button}KeyLongPress" = "ignore";
         })
         [
           "Hibernate"
