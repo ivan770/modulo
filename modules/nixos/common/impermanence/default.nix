@@ -28,7 +28,7 @@ in
 
     # Nix can quickly drain the entire root tmpfs during the build process,
     # so the build directory has to be moved to a persistent storage.
-    nix.settings.build-dir = "/var/tmp";
+    nix.settings.build-dir = "/nix/build";
 
     system.etc.overlay = {
       enable = true;
