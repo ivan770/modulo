@@ -100,7 +100,7 @@ let
         chromiumConfigDir = sloth.concat' sloth.xdgConfigHome "/chromium";
       in
       {
-        app.package = pkgs.ungoogled-chromium.override {
+        app.package = pkgs.unstable.ungoogled-chromium.override {
           commandLineArgs = concatStringsSep " " flags;
           enableWideVine = true;
         };
