@@ -20,7 +20,13 @@ in
       linkInputs = true;
 
       settings = {
+        auto-allocate-uids = true;
         auto-optimise-store = true;
+        experimental-features = [
+          "auto-allocate-uids"
+          "cgroups"
+        ];
+        extra-system-features = [ "uid-range" ];
         flake-registry = "";
         trusted-users = [
           "root"
