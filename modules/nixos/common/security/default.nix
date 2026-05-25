@@ -14,10 +14,10 @@ in
     systemPackages = [ sudoShim ];
   };
 
-  systemd.coredump.extraConfig = ''
-    Storage=none
-    ProcessSizeMax=0
-  '';
+  systemd.coredump.settings.Coredump = {
+    Storage = "none";
+    ProcessSizeMax = 0;
+  };
 
   security = {
     # Polkit is required for run0 to function properly.

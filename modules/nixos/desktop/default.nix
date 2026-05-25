@@ -112,7 +112,6 @@ in
     services = {
       dbus = {
         enable = true;
-        implementation = "broker";
         packages = [ pkgs.gcr ];
       };
 

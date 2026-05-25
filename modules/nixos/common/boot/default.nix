@@ -48,7 +48,5 @@ in
         configurationLimit = 5;
       };
     };
-
-    initrd.systemd.enable = true;
   };
 }
