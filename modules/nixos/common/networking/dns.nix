@@ -37,18 +37,18 @@ in
   config = mkIf config.modulo.networking.enable {
     services.resolved = {
       enable = true;
-      dnssec =
-        if cfg.authentication == "required" then
-          "true"
-        else if cfg.authentication == "allowed" then
-          "allow-downgrade"
-        else
-          "false";
-      dnsovertls = if cfg.encryption == "required" then "true" else "opportunistic";
-      llmnr = "false";
-      extraConfig = ''
-        MulticastDNS=false
-      '';
+      settings.Resolve = {
+        DNSSEC =
+          if cfg.authentication == "required" then
+            true
+          else if cfg.authentication == "allowed" then
+            "allow-downgrade"
+          else
+            false;
+        LLMNR = false;
+        DNSOverTLS = if cfg.encryption == "required" then true else "opportunistic";
+        MulticastDNS = false;
+      };
     };
 
     networking.resolvconf.enable = false;
