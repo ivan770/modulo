@@ -66,7 +66,7 @@ in
                 {
                   type = "ladspa";
                   name = "rnnoise";
-                  plugin = "${rnnoise}/lib/ladspa/librnnoise_ladspa.so";
+                  plugin = "librnnoise_ladspa";
                   label = "noise_suppressor_${cfg.noiseCancellation.output}";
                   control = {
                     "VAD Threshold (%)" = cfg.noiseCancellation.threshold;
