@@ -76,22 +76,28 @@ in
     };
   };
 
-  config.services.tlp = mkIf (cfg.cpu != null) {
-    enable = true;
+  config.services = {
+    tlp = mkIf (cfg.cpu != null) {
+      enable = true;
+      pd.enable = true;
 
-    settings = mkMerge [
-      {
-        CPU_SCALING_GOVERNOR_ON_AC = cfg.cpu.ac;
-        CPU_SCALING_GOVERNOR_ON_BAT = cfg.cpu.bat;
+      settings = mkMerge [
+        {
+          CPU_SCALING_GOVERNOR_ON_AC = cfg.cpu.ac;
+          CPU_SCALING_GOVERNOR_ON_BAT = cfg.cpu.bat;
 
-        CPU_BOOST_ON_AC = 1;
-        CPU_BOOST_ON_BAT = 0;
-      }
+          CPU_BOOST_ON_AC = 1;
+          CPU_BOOST_ON_BAT = 0;
+        }
 
-      (mkIf (cfg.battery.chargeMode != null) {
-        START_CHARGE_THRESH_BAT0 = batteryThresholds.${cfg.battery.chargeMode}.start;
-        STOP_CHARGE_THRESH_BAT0 = batteryThresholds.${cfg.battery.chargeMode}.stop;
-      })
-    ];
+        (mkIf (cfg.battery.chargeMode != null) {
+          START_CHARGE_THRESH_BAT0 = batteryThresholds.${cfg.battery.chargeMode}.start;
+          STOP_CHARGE_THRESH_BAT0 = batteryThresholds.${cfg.battery.chargeMode}.stop;
+        })
+      ];
+    };
+
+    # Disable PPD to avoid accidental conflicts with desktop environment default configs.
+    power-profiles-daemon.enable = false;
   };
 }

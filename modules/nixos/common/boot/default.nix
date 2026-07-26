@@ -45,7 +45,7 @@ in
         enable = true;
         editor = false;
         consoleMode = "max";
-        configurationLimit = 5;
+        configurationLimit = 25;
       };
     };
   };

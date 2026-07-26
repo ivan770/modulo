@@ -38,19 +38,6 @@ in
               driverPackage = graphics.package;
               driverPackage32Bit = mkIf graphics.enable32Bit graphics.package32;
             };
-
-            gtk =
-              let
-                gtkEnabled = mkIf config.gtk.enable;
-              in
-              {
-                gtk3Config = gtkEnabled config.xdg.configFile."gtk-3.0/settings.ini".text;
-                gtk4Config = gtkEnabled config.xdg.configFile."gtk-4.0/settings.ini".text;
-
-                cursor = {
-                  inherit (config.modulo.desktop.cursor) package name size;
-                };
-              };
           };
         };
     };

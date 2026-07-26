@@ -1,7 +1,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -18,6 +17,5 @@ in
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
-    extraLadspaPackages = [ pkgs.modulo.rnnoise ];
   };
 }

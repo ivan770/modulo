@@ -1,13 +1,11 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   inherit (lib)
     attrNames
-    getExe
     head
     length
     mkEnableOption
@@ -37,7 +35,7 @@ in
       }
     ];
 
-    # Required for Pipewire and Sway to acquire realtime capabilities.
+    # Required for Pipewire to acquire realtime capabilities.
     #
     # Modulo relies on user services for Pipewire activation,
     # so the "audio" group is not used here.
@@ -110,35 +108,16 @@ in
     };
 
     services = {
-      dbus = {
-        enable = true;
-        packages = [ pkgs.gcr ];
-      };
+      dbus.enable = true;
 
-      # Activated by greetd by default.
-      displayManager.enable = false;
-
-      greetd =
+      displayManager.autoLogin =
         let
           users = attrNames config.snowfallorg.users;
           autoLogin = (length users) == 1;
-          command = getExe pkgs.modulo.desktop-init;
         in
         {
-          enable = true;
-
-          settings = {
-            default_session.command = ''
-              ${getExe pkgs.tuigreet} \
-                --time \
-                --cmd "${command}"
-            '';
-
-            initial_session = mkIf autoLogin {
-              inherit command;
-              user = head users;
-            };
-          };
+          enable = autoLogin;
+          user = head users;
         };
     };
   };

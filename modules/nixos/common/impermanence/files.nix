@@ -29,6 +29,7 @@ in
 
   config.environment.persistence.${cfg.persistentDirectory} = {
     hideMounts = true;
+    allowTrash = true;
 
     directories = [
       "/var/lib/nixos"

@@ -13,7 +13,6 @@ let
     mapAttrs
     mapAttrs'
     mapAttrsToList
-    mkEnableOption
     mkIf
     mkOption
     nameValuePair
@@ -116,8 +115,6 @@ in
         '';
       };
     };
-
-    udisks2 = mkEnableOption "udisks2 daemon";
   };
 
   imports = [
@@ -340,8 +337,6 @@ in
             ) cfg.disks;
           in
           concatStringsSep "\n" rules;
-
-        udisks2.enable = mkIf cfg.udisks2 true;
       };
     };
 }

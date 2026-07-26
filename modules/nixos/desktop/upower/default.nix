@@ -14,15 +14,24 @@ in
     batteryPolling = mkEnableOption "battery polling";
   };
 
-  config.services.upower = mkIf cfg.enable {
-    enable = true;
-    ignoreLid = true;
-    noPollBatteries = !cfg.batteryPolling;
+  config = mkIf cfg.enable {
+    services.upower = {
+      enable = true;
+      ignoreLid = true;
+      noPollBatteries = !cfg.batteryPolling;
 
-    percentageLow = 20;
-    percentageCritical = 5;
+      percentageLow = 20;
+      percentageCritical = 5;
 
-    allowRiskyCriticalPowerAction = true;
-    criticalPowerAction = "Ignore";
+      allowRiskyCriticalPowerAction = true;
+      criticalPowerAction = "Ignore";
+    };
+
+    modulo.impermanence.directories = [
+      {
+        directory = "/var/lib/upower";
+        mode = "0700";
+      }
+    ];
   };
 }
