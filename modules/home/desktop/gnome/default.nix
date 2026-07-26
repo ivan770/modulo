@@ -22,8 +22,25 @@ in
           mode = "0700";
         }
 
+        # App autostart config
+        ".config/autostart"
+
+        # Custom user backgrounds
+        ".local/share/backgrounds"
+
+        # Online accounts data
+        ".config/goa-1.0"
+
         # GNOME settings daemon data
         ".local/share/gnome-settings-daemon"
+
+        # GNOME software data
+        ".local/share/gnome-software"
+        ".local/state/gnome-software"
+
+        # File explorer data
+        ".config/nautilus"
+        ".local/share/nautilus"
 
         # Display colour profiles
         ".local/share/icc"
@@ -32,6 +49,9 @@ in
       files = [
         # Initial setup flag
         ".config/gnome-initial-setup-done"
+
+        # Scheme handler configuration
+        ".config/mimeapps.list"
 
         # Display layout configuration
         {
