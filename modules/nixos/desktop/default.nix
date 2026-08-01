@@ -35,31 +35,6 @@ in
       }
     ];
 
-    # Required for Pipewire to acquire realtime capabilities.
-    #
-    # Modulo relies on user services for Pipewire activation,
-    # so the "audio" group is not used here.
-    security.pam.loginLimits = [
-      {
-        domain = "@users";
-        type = "-";
-        item = "memlock";
-        value = "unlimited";
-      }
-      {
-        domain = "@users";
-        type = "-";
-        item = "rtprio";
-        value = "99";
-      }
-      {
-        domain = "@users";
-        type = "-";
-        item = "nice";
-        value = "-19";
-      }
-    ];
-
     # Fonts are meant to be set up using Home Manager.
     fonts.fontconfig.defaultFonts = {
       monospace = [ ];
@@ -68,7 +43,6 @@ in
       emoji = [ ];
     };
 
-    boot.enableContainers = false;
     console.enable = false;
     hardware.graphics.enable = true;
 

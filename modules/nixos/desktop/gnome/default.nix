@@ -5,30 +5,16 @@
   ...
 }:
 let
-  inherit (lib) mkEnableOption mkIf;
-
-  cfg = config.modulo.desktop.gnome;
-
   defaultExtensions = [
     pkgs.gnomeExtensions.dash-to-dock
     pkgs.gnomeExtensions.appindicator
   ];
 in
 {
-  options.modulo.desktop.gnome = {
-    enable = mkEnableOption "GNOME desktop support";
-  };
-
-  config = mkIf cfg.enable {
-    services.desktopManager.gnome = {
-      enable = true;
-      debug = true;
-    };
-
-    # GDM is required in this config.
-    services.displayManager = {
-      gdm.enable = true;
-      defaultSession = "gnome";
+  config = lib.mkIf config.modulo.desktop.enable {
+    services = {
+      desktopManager.gnome.enable = true;
+      displayManager.gdm.enable = true;
     };
 
     environment = {

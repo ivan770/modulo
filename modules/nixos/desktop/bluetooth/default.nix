@@ -12,13 +12,12 @@ in
 {
   options.modulo.desktop.bluetooth = {
     enable = mkEnableOption "Bluetooth support";
-    onStartup = mkEnableOption "automatically enable Bluetooth on startup";
   };
 
   config = mkIf cfg.enable {
     hardware.bluetooth = {
       enable = true;
-      powerOnBoot = cfg.onStartup;
+      powerOnBoot = false;
 
       # Required to acquire the battery status of connected devices
       package = pkgs.bluez5-experimental;

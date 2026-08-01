@@ -3,13 +3,20 @@
   osConfig,
   ...
 }:
-let
-  gnomeEnabled = osConfig.modulo.desktop.gnome.enable;
-in
 {
-  config = lib.mkIf gnomeEnabled {
+  config = lib.mkIf osConfig.modulo.desktop.enable {
     modulo.home-impermanence = {
       directories = [
+        # Flatpak
+        {
+          directory = ".var/app";
+          mode = "0700";
+        }
+        {
+          directory = ".local/share/flatpak";
+          mode = "0700";
+        }
+
         # GNOME Keyring data
         {
           directory = ".local/share/keyrings";
