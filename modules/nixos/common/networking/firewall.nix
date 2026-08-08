@@ -51,6 +51,8 @@ in
 
       tables.firewall =
         let
+          isHeadless = config.modulo.headless.enable;
+
           forwardedInterfaces =
             attrNames (filterAttrs (_: { dhcp, ... }: dhcp == "server") config.modulo.networking.interfaces)
             ++ cfg.forwardedInterfaces;
@@ -59,7 +61,9 @@ in
 
           mkForwardedInterfacesRule =
             criteria: rule:
-            optionalString (forwardedInterfaces != [ ]) "${criteria} ${mkSet forwardedInterfaces} ${rule}";
+            optionalString (
+              isHeadless && forwardedInterfaces != [ ]
+            ) "${criteria} ${mkSet forwardedInterfaces} ${rule}";
 
           mkForwardedInterfacesInputRule = mkForwardedInterfacesRule "iifname";
 
@@ -107,13 +111,15 @@ in
 
           mkRelayForwardingRule =
             rule:
-            optionalString config.modulo.networking.wireguard.actsAsRelay "iifname wg0 oifname wg0 ${rule}";
+            optionalString (
+              isHeadless && config.modulo.networking.wireguard.actsAsRelay
+            ) "iifname wg0 oifname wg0 ${rule}";
         in
         {
           family = "inet";
 
           content = ''
-            ${optionalString rateLimitEnabled ''
+            ${optionalString (isHeadless && rateLimitEnabled) ''
               set banned {
                 type ipv4_addr
                 flags dynamic
@@ -131,7 +137,7 @@ in
               type filter hook input priority 0; policy drop;
 
               # Block banned addresses from accessing resources.
-              ${optionalString rateLimitEnabled "ip saddr @banned drop"}
+              ${optionalString (isHeadless && rateLimitEnabled) "ip saddr @banned drop"}
 
               # Accept correct connections and immediately drop invalid ones
               ct state vmap { established : accept, related : accept, invalid : drop }

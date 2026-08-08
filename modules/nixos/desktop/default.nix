@@ -35,6 +35,9 @@ in
       }
     ];
 
+    # Network support implied by default.
+    modulo.networking.enable = lib.mkDefault true;
+
     # Fonts are meant to be set up using Home Manager.
     fonts.fontconfig.defaultFonts = {
       monospace = [ ];

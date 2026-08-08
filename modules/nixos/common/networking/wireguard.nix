@@ -122,10 +122,9 @@ in
   config =
     let
       hostname = config.networking.hostName;
-
       memberZones = filterAttrs (_: { nodes, ... }: hasAttr hostname nodes) cfg.mesh;
     in
-    mkIf (config.modulo.networking.enable && cfg.mesh != { }) {
+    mkIf (config.modulo.networking.enable && config.modulo.headless.enable && cfg.mesh != { }) {
       assertions = [
         {
           assertion = all (
