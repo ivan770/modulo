@@ -19,10 +19,10 @@ let
 
   inherit (builtins) hashString;
 
-  cfg = config.modulo.networking;
+  cfg = config.modulo.headless.networking;
 in
 {
-  options.modulo.networking = {
+  options.modulo.headless.networking = {
     interfaces = mkOption {
       type = types.attrsOf (
         types.submodule {
@@ -196,7 +196,12 @@ in
     };
   };
 
-  config = mkIf (cfg.enable && config.modulo.headless.enable) {
+  imports = [
+    ./firewall.nix
+    ./wireguard.nix
+  ];
+
+  config = mkIf (config.modulo.networking.enable && config.modulo.headless.enable) {
     systemd.network =
       let
         mkName = name: substring 0 8 (hashString "sha256" name);

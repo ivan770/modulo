@@ -15,7 +15,9 @@ let
 in
 {
   options.modulo.networking = {
-    enable = mkEnableOption "managed networking stack";
+    enable = mkEnableOption "managed networking stack" // {
+      default = true;
+    };
 
     keepalive = {
       time = mkOption {
@@ -53,14 +55,7 @@ in
     };
   };
 
-  imports = [
-    ./types/desktop.nix
-    ./types/headless.nix
-
-    ./dns.nix
-    ./firewall.nix
-    ./wireguard.nix
-  ];
+  imports = [ ./dns.nix ];
 
   config = mkIf cfg.enable {
     systemd.network.wait-online.enable = false;

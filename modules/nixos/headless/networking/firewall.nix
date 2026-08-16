@@ -21,10 +21,10 @@ let
     types
     ;
 
-  cfg = config.modulo.networking.firewall;
+  cfg = config.modulo.headless.networking.firewall;
 in
 {
-  options.modulo.networking.firewall = {
+  options.modulo.headless.networking.firewall = {
     rateLimit = {
       banTime = mkOption {
         type = types.str;
@@ -45,25 +45,23 @@ in
     };
   };
 
-  config.networking = mkIf config.modulo.networking.enable {
+  config.networking = mkIf (config.modulo.networking.enable && config.modulo.headless.enable) {
     nftables = {
       enable = true;
 
       tables.firewall =
         let
-          isHeadless = config.modulo.headless.enable;
-
           forwardedInterfaces =
-            attrNames (filterAttrs (_: { dhcp, ... }: dhcp == "server") config.modulo.networking.interfaces)
+            attrNames (
+              filterAttrs (_: { dhcp, ... }: dhcp == "server") config.modulo.headless.networking.interfaces
+            )
             ++ cfg.forwardedInterfaces;
 
           mkSet = values: "{ ${concatStringsSep ", " (map (value: "\"${value}\"") values)} }";
 
           mkForwardedInterfacesRule =
             criteria: rule:
-            optionalString (
-              isHeadless && forwardedInterfaces != [ ]
-            ) "${criteria} ${mkSet forwardedInterfaces} ${rule}";
+            optionalString (forwardedInterfaces != [ ]) "${criteria} ${mkSet forwardedInterfaces} ${rule}";
 
           mkForwardedInterfacesInputRule = mkForwardedInterfacesRule "iifname";
 
@@ -71,7 +69,7 @@ in
             length (attrNames config.modulo.headless.containers.activatedConfigurations) > 1
           ) ''iifname "ve-*" oifname "ve-*" accept'';
 
-          publicServices = pipe config.modulo.networking.interfaces [
+          publicServices = pipe config.modulo.headless.networking.interfaces [
             (mapAttrs (_: { exposedPorts, ... }: exposedPorts))
             (mapAttrsToList (
               name:
@@ -103,7 +101,7 @@ in
             (concatStringsSep "\n")
           ];
 
-          rateLimitEnabled = pipe config.modulo.networking.interfaces [
+          rateLimitEnabled = pipe config.modulo.headless.networking.interfaces [
             (mapAttrs (_: { exposedPorts, ... }: exposedPorts))
             (filterAttrs (_: any (port: isAttrs port && port.rateLimit != null)))
             (val: val != { })
@@ -111,15 +109,13 @@ in
 
           mkRelayForwardingRule =
             rule:
-            optionalString (
-              isHeadless && config.modulo.networking.wireguard.actsAsRelay
-            ) "iifname wg0 oifname wg0 ${rule}";
+            optionalString config.modulo.headless.networking.wireguard.actsAsRelay "iifname wg0 oifname wg0 ${rule}";
         in
         {
           family = "inet";
 
           content = ''
-            ${optionalString (isHeadless && rateLimitEnabled) ''
+            ${optionalString rateLimitEnabled ''
               set banned {
                 type ipv4_addr
                 flags dynamic
@@ -137,7 +133,7 @@ in
               type filter hook input priority 0; policy drop;
 
               # Block banned addresses from accessing resources.
-              ${optionalString (isHeadless && rateLimitEnabled) "ip saddr @banned drop"}
+              ${optionalString rateLimitEnabled "ip saddr @banned drop"}
 
               # Accept correct connections and immediately drop invalid ones
               ct state vmap { established : accept, related : accept, invalid : drop }

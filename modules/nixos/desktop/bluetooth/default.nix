@@ -17,7 +17,7 @@ in
   config = {
     hardware.bluetooth = {
       # Enforce consistency even when the default desktop configuration from Nixpkgs enables Bluetooth by default.
-      enable = cfg.enable;
+      inherit (cfg) enable;
 
       powerOnBoot = false;
 

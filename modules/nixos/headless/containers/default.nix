@@ -208,7 +208,7 @@ in
           )
         );
 
-        networking.firewall.forwardedInterfaces = mapAttrsToList (name: _: "ve-${name}") (
+        headless.networking.firewall.forwardedInterfaces = mapAttrsToList (name: _: "ve-${name}") (
           filterAttrs (
             _: { serviceConfiguration, ... }: serviceConfiguration.forwardInterface
           ) intersectedConfigurations

@@ -7,10 +7,13 @@ let
   cfg = config.modulo.networking;
 in
 {
+  imports = [ ./firewall.nix ];
+
   config = lib.mkIf config.modulo.desktop.enable {
     networking.networkmanager = {
       # Enforce consistency even when the default desktop configuration from Nixpkgs enables networking by default.
-      enable = cfg.enable;
+      inherit (cfg) enable;
+
       dns = "systemd-resolved";
       wifi.macAddress = "stable-ssid";
     };

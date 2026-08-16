@@ -205,7 +205,9 @@ in
         }
         {
           assertion = mkActivatedUpstreamAssertion (
-            _: { listen, ... }: listen == "wireguard" && config.modulo.networking.wireguard.addresses == [ ]
+            _:
+            { listen, ... }:
+            listen == "wireguard" && config.modulo.headless.networking.wireguard.addresses == [ ]
           );
 
           message = ''
@@ -269,7 +271,7 @@ in
             }:
             {
               listenAddresses = mkIf (listen == "wireguard") (
-                map (a: "[${a}]") config.modulo.networking.wireguard.addresses
+                map (a: "[${a}]") config.modulo.headless.networking.wireguard.addresses
               );
 
               locations =

@@ -20,10 +20,10 @@ let
     types
     ;
 
-  cfg = config.modulo.networking.wireguard;
+  cfg = config.modulo.headless.networking.wireguard;
 in
 {
-  options.modulo.networking.wireguard = {
+  options.modulo.headless.networking.wireguard = {
     ulaCidr = mkOption {
       type = types.str;
       description = ''
@@ -219,7 +219,7 @@ in
       );
 
       modulo = {
-        networking = {
+        headless.networking = {
           interfaces.wg0 = {
             dhcp = null;
             address = map (address: "${address}/48") cfg.addresses;
