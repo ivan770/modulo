@@ -6,10 +6,10 @@
 let
   inherit (lib) mkOption types;
 
-  cfg = config.modulo.locale;
+  cfg = config.modulo.headless.locale;
 in
 {
-  options.modulo.locale = {
+  options.modulo.headless.locale = {
     base = mkOption {
       type = types.str;
       default = "en_US.UTF-8";
