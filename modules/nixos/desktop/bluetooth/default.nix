@@ -14,9 +14,11 @@ in
     enable = mkEnableOption "Bluetooth support";
   };
 
-  config = mkIf cfg.enable {
+  config = {
     hardware.bluetooth = {
-      enable = true;
+      # Enforce consistency even when the default desktop configuration from Nixpkgs enables Bluetooth by default.
+      enable = cfg.enable;
+
       powerOnBoot = false;
 
       # Required to acquire the battery status of connected devices
@@ -24,7 +26,7 @@ in
       settings.General.Experimental = true;
     };
 
-    modulo.impermanence.directories = [
+    modulo.impermanence.directories = mkIf cfg.enable [
       {
         directory = "/var/lib/bluetooth";
         mode = "0700";
