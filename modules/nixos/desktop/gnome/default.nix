@@ -24,6 +24,11 @@ in
       gnome.excludePackages = [
         pkgs.baobab
         pkgs.decibels
+        pkgs.snapshot
+        pkgs.showtime
+        pkgs.simple-scan
+        pkgs.papers
+        pkgs.epiphany
         pkgs.gnome-contacts
         pkgs.gnome-font-viewer
         pkgs.gnome-maps
