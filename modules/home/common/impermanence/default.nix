@@ -39,6 +39,10 @@ in
           directory = ".pki";
           mode = "0700";
         }
+        {
+          directory = ".ssh";
+          mode = "0700";
+        }
 
         # .config/*
         {
@@ -61,16 +65,6 @@ in
         "Public"
         "Templates"
         "Videos"
-      ];
-
-      files = [
-        {
-          file = ".ssh/known_hosts";
-          parentDirectory = {
-            mode = "0700";
-          };
-        }
-        ".ssh/id_rsa"
       ];
     };
   };
