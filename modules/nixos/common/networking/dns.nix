@@ -35,21 +35,34 @@ in
   };
 
   config = mkIf config.modulo.networking.enable {
-    services.resolved = {
-      enable = true;
-      settings.Resolve = {
-        DNSSEC =
-          if cfg.authentication == "required" then
-            true
-          else if cfg.authentication == "allowed" then
-            "allow-downgrade"
-          else
-            false;
-        LLMNR = false;
-        DNSOverTLS = if cfg.encryption == "required" then true else "opportunistic";
+    services = {
+      resolved = {
+        enable = true;
+        settings.Resolve = {
+          DNSSEC =
+            if cfg.authentication == "required" then
+              true
+            else if cfg.authentication == "allowed" then
+              "allow-downgrade"
+            else
+              false;
+          LLMNR = false;
+          DNSOverTLS = if cfg.encryption == "required" then true else "opportunistic";
 
-        # Allow mDNS on desktop for easier media service discovery.
-        MulticastDNS = config.modulo.desktop.enable;
+          # mDNS is delegated to Avahi where necessary.
+          MulticastDNS = false;
+        };
+      };
+
+      # Built-in systemd-resolved mDNS support is not compatible
+      # with certain applications.
+      avahi = {
+        enable = true;
+
+        publish = {
+          enable = true;
+          userServices = true;
+        };
       };
     };
 
