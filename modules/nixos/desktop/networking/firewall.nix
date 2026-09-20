@@ -54,6 +54,10 @@
               # Accept DHCPv6 on the link-local scope.
               ip6 saddr fe80::/10 udp dport dhcpv6-client accept
 
+              # Allow mDNS connections.
+              udp dport mdns ip daddr 224.0.0.251 accept
+              udp dport mdns ip6 daddr ff02::fb accept
+
               # Allow local network connections for SSH, media remote control.
               ip saddr @lan_v4 accept
               ip6 saddr @lan_v6 accept

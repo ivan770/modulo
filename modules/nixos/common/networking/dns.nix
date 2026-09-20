@@ -47,7 +47,9 @@ in
             false;
         LLMNR = false;
         DNSOverTLS = if cfg.encryption == "required" then true else "opportunistic";
-        MulticastDNS = false;
+
+        # Allow mDNS on desktop for easier media service discovery.
+        MulticastDNS = config.modulo.desktop.enable;
       };
     };
 
